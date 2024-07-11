@@ -2,7 +2,61 @@
 
 #### 313551055 柯柏旭
 
+## 1. Introduction
 
+
+
+## 2. Experiment setups
+
+#### Hardware overview
+
+```shell
+Model Name: MacBook Pro
+Model Identifier: Mac15,6
+Model Number: MRX33TA/A
+Chip: Apple M3 Pro
+Total Number of Cores: 11 (5 performance and 6 efficiency)
+Memory: 18 GB
+```
+
+#### Python version
+
+```sh
+Python 3.9.19
+```
+
+### A. Sigmoid functions 
+
+```python
+def sigmoid(x):
+    return 1.0 / (1.0 + np.exp(-x))
+
+def derivative_sigmoid(x):
+    return np.multiply(x, 1.0 - x)
+```
+
+(refer to lab1 document)
+
+### B. Neural network 
+
+```python
+```
+
+
+
+### C. Backpropagation 
+
+## 3. Result of testing
+
+### A. Screenshot and comparison figure 
+
+### B. Show the accuracy of your prediction
+
+### C. Learning curve (loss, epoch curve)
+
+### D. Anything you want to present
+
+## 4. Discussion
 
 
 
