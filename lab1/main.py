@@ -5,8 +5,8 @@ from tools import generate_linear, generate_XOR_easy, sigmoid, derivative_sigmoi
 
 def initialize_weights(input_size, hidden_size1, hidden_size2, output_size):
     weights = {
-        'W1': np.random.randn(input_size, hidden_size1),
-        'b1': np.zeros((1, hidden_size1)),
+        'W1': np.random.randn(input_size, hidden_size1), # shape: (input_size, hidden_size1)
+        'b1': np.zeros((1, hidden_size1)), # shape: (1, hidden_size1)
         'W2': np.random.randn(hidden_size1, hidden_size2),
         'b2': np.zeros((1, hidden_size2)),
         'W3': np.random.randn(hidden_size2, output_size),
@@ -15,7 +15,7 @@ def initialize_weights(input_size, hidden_size1, hidden_size2, output_size):
     return weights
 
 def forward_propagation(X, weights):
-    Z1 = np.dot(X, weights['W1']) + weights['b1']
+    Z1 = np.dot(X, weights['W1']) + weights['b1'] 
     A1 = sigmoid(Z1)
     Z2 = np.dot(A1, weights['W2']) + weights['b2']
     A2 = sigmoid(Z2)
@@ -23,6 +23,7 @@ def forward_propagation(X, weights):
     A3 = sigmoid(Z3)
     return Z1, A1, Z2, A2, Z3, A3
 
+# MSE
 def compute_loss(y_true, y_pred):
     return np.mean((y_true - y_pred) ** 2)
 
@@ -58,7 +59,7 @@ def train(X, y, input_size, hidden_size1, hidden_size2, output_size, learning_ra
         loss = compute_loss(y, A3)
         back_propagation(X, y, weights, Z1, A1, Z2, A2, Z3, A3, learning_rate)
         
-        if epoch % 100 == 0:
+        if epoch % 1000 == 0:
             print(f'Epoch {epoch}, Loss: {loss}')
     
     return weights
@@ -86,6 +87,12 @@ def show_result(x, y, pred_y):
 
     plt.show()
 
+# 顯示測試結果
+def show_testing_result(X, y, pred_y, loss, accuracy):
+    for i in range(X.shape[0]):
+        print(f"Iter{i+1} | Ground truth: {y[i][0]} | prediction: {pred_y[i][0]:.5f} |")
+    print(f"loss={loss:.5f} accuracy={accuracy:.2f}%")
+
 # 線性數據
 X_linear, y_linear = generate_linear()
 input_size = 2
@@ -93,25 +100,35 @@ hidden_size1 = 4
 hidden_size2 = 4
 output_size = 1
 learning_rate = 0.1
-epochs = 10
+epochs = 100000
 
 # 訓練模型
 weights_linear = train(X_linear, y_linear, input_size, hidden_size1, hidden_size2, output_size, learning_rate, epochs)
 
 # 預測結果
 pred_y_linear = predict(X_linear, weights_linear)
+loss_linear = compute_loss(y_linear, pred_y_linear)
+accuracy_linear = np.mean((pred_y_linear > 0.5) == y_linear) * 100
+
+# 顯示測試結果
+show_testing_result(X_linear, y_linear, pred_y_linear, loss_linear, accuracy_linear)
 
 # 可視化結果
 show_result(X_linear, y_linear, pred_y_linear)
 
-# # XOR 數據
-# X_xor, y_xor = generate_XOR_easy()
+# XOR 數據
+X_xor, y_xor = generate_XOR_easy()
 
-# # 訓練模型
-# weights_xor = train(X_xor, y_xor, input_size, hidden_size1, hidden_size2, output_size, learning_rate, epochs)
+# 訓練模型
+weights_xor = train(X_xor, y_xor, input_size, hidden_size1, hidden_size2, output_size, learning_rate, epochs)
 
-# # 預測結果
-# pred_y_xor = predict(X_xor, weights_xor)
+# 預測結果
+pred_y_xor = predict(X_xor, weights_xor)
+loss_xor = compute_loss(y_xor, pred_y_xor)
+accuracy_xor = np.mean((pred_y_xor > 0.5) == y_xor) * 100
 
-# # 可視化結果
-# show_result(X_xor, y_xor, pred_y_xor)
+# 顯示測試結果
+show_testing_result(X_xor, y_xor, pred_y_xor, loss_xor, accuracy_xor)
+
+# 可視化結果
+show_result(X_xor, y_xor, pred_y_xor)

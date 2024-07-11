@@ -33,6 +33,7 @@ def derivative_sigmoid(x):
     return np.multiply(x, 1.0 - x)
 
 
+# no use, just for reference
 def show_result(x, y, pred_y):
     plt.subplot(1, 2, 1)
     plt.title('Ground truth', fontsize = 18)
