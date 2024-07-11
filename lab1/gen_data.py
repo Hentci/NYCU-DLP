@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def gernerate_linear(n=100):
     pts = np.random.uniform(0, 1, (n, 2))
     inputs = []
