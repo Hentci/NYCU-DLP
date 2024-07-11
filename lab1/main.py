@@ -23,13 +23,15 @@ def forward_propagation(X, weights):
     A3 = sigmoid(Z3)
     return Z1, A1, Z2, A2, Z3, A3
 
-# MSE
+# cost(loss) function: MSE
 def compute_loss(y_true, y_pred):
     return np.mean((y_true - y_pred) ** 2)
 
+# .T: transpose
 def back_propagation(X, y, weights, Z1, A1, Z2, A2, Z3, A3, learning_rate):
-    m = y.shape[0]
+    m = y.shape[0] # number of samples
     
+    # compute gradients
     dZ3 = A3 - y
     dW3 = np.dot(A2.T, dZ3) / m
     db3 = np.sum(dZ3, axis=0, keepdims=True) / m
@@ -44,6 +46,7 @@ def back_propagation(X, y, weights, Z1, A1, Z2, A2, Z3, A3, learning_rate):
     dW1 = np.dot(X.T, dZ1) / m
     db1 = np.sum(dZ1, axis=0, keepdims=True) / m
     
+    # update weights
     weights['W3'] -= learning_rate * dW3
     weights['b3'] -= learning_rate * db3
     weights['W2'] -= learning_rate * dW2
@@ -80,7 +83,7 @@ def show_result(x, y, pred_y):
     plt.subplot(1, 2, 2)
     plt.title('Predict result', fontsize=18)
     for i in range(x.shape[0]):
-        if pred_y[i] < 0.5:
+        if pred_y[i] < 0.5: # sigmoid output, 0.5 is the threshold
             plt.plot(x[i][0], x[i][1], 'ro')
         else:
             plt.plot(x[i][0], x[i][1], 'bo')
@@ -91,7 +94,7 @@ def show_result(x, y, pred_y):
 def show_testing_result(X, y, pred_y, loss, accuracy):
     for i in range(X.shape[0]):
         print(f"Iter{i+1} | Ground truth: {y[i][0]} | prediction: {pred_y[i][0]:.5f} |")
-    print(f"loss={loss:.5f} accuracy={accuracy:.2f}%")
+    print(f"loss={loss:.10f} accuracy={accuracy:.2f}%")
 
 # 線性數據
 X_linear, y_linear = generate_linear()
