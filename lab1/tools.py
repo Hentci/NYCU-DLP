@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def gernerate_linear(n=100):
+def generate_linear(n=100):
     pts = np.random.uniform(0, 1, (n, 2))
     inputs = []
     labels = []
@@ -31,4 +31,24 @@ def sigmoid(x):
 
 def derivative_sigmoid(x):
     return np.multiply(x, 1.0 - x)
+
+
+def show_result(x, y, pred_y):
+    plt.subplot(1, 2, 1)
+    plt.title('Ground truth', fontsize = 18)
+    for i in range(x.shape[0]):
+        if y[i] == 0:
+            plt.plot(x[i][0], x[i][1], 'ro')
+        else:
+            plt.plot(x[i][0], x[i][1], 'bo')
+
+    plt.subplot(1, 2, 2)
+    plt.title('Predict result', fontsize = 18)
+    for i in range(x.shape[0]):
+        if pred_y[i] == 0:
+            plt.plot(x[i][0], x[i][1], 'ro')
+        else:
+            plt.plot(x[i][0], x[i][1], 'bo')
+
+    plt.show()
 
