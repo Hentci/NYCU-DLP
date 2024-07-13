@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from tools import generate_linear, generate_XOR_easy, sigmoid, derivative_sigmoid
+from tools import generate_linear, generate_XOR_easy, sigmoid, derivative_sigmoid, plot_loss_curve
 
 def initialize_weights(input_size, hidden_size1, hidden_size2, output_size):
     weights = {
@@ -33,8 +33,8 @@ def back_propagation(X, y, weights, Z1, A1, Z2, A2, Z3, A3, learning_rate):
     
     # compute gradients
     dZ3 = (A3 - y) * 2
-    dW3 = np.dot(A2.T, dZ3) / m
-    db3 = np.sum(dZ3, axis=0, keepdims=True) / m
+    dW3 = np.dot(A2.T, dZ3) / m  # / m 取平均值
+    db3 = np.sum(dZ3, axis=0, keepdims=True) / m # 沿著 row 求和，並保持維度
     
     dA2 = np.dot(dZ3, weights['W3'].T)
     dZ2 = dA2 * derivative_sigmoid(A2)
@@ -56,16 +56,18 @@ def back_propagation(X, y, weights, Z1, A1, Z2, A2, Z3, A3, learning_rate):
 
 def train(X, y, input_size, hidden_size1, hidden_size2, output_size, learning_rate, epochs):
     weights = initialize_weights(input_size, hidden_size1, hidden_size2, output_size)
-    
+    loss_history = []
+
     for epoch in range(epochs):
         Z1, A1, Z2, A2, Z3, A3 = forward_propagation(X, weights)
         loss = compute_loss(y, A3)
+        loss_history.append(loss)
         back_propagation(X, y, weights, Z1, A1, Z2, A2, Z3, A3, learning_rate)
-        
-        if epoch % 1000 == 0:
+
+        if epoch % 5000 == 0:
             print(f'Epoch {epoch}, Loss: {loss}')
     
-    return weights
+    return weights, loss_history
 
 def predict(X, weights):
     _, _, _, _, _, A3 = forward_propagation(X, weights)
@@ -106,7 +108,9 @@ learning_rate = 0.1
 epochs = 100000
 
 # 訓練模型
-weights_linear = train(X_linear, y_linear, input_size, hidden_size1, hidden_size2, output_size, learning_rate, epochs)
+weights_linear, loss_history_linear = train(X_linear, y_linear, input_size, hidden_size1, hidden_size2, output_size, learning_rate, epochs)
+
+plot_loss_curve(loss_history_linear, title="Loss Curve for Linear Data")
 
 # 預測結果
 pred_y_linear = predict(X_linear, weights_linear)
@@ -123,7 +127,10 @@ show_result(X_linear, y_linear, pred_y_linear)
 X_xor, y_xor = generate_XOR_easy()
 
 # 訓練模型
-weights_xor = train(X_xor, y_xor, input_size, hidden_size1, hidden_size2, output_size, learning_rate, epochs)
+weights_xor, loss_history_xor = train(X_xor, y_xor, input_size, hidden_size1, hidden_size2, output_size, learning_rate, epochs)
+
+
+plot_loss_curve(loss_history_xor, title="Loss Curve for XOR Data")
 
 # 預測結果
 pred_y_xor = predict(X_xor, weights_xor)

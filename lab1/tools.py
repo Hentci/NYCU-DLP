@@ -56,3 +56,12 @@ def show_result(x, y, pred_y):
 
     plt.show()
 
+def plot_loss_curve(loss_history, title="Loss Curve"):
+    plt.figure(figsize=(10, 5))
+    plt.plot(loss_history, label='Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title(title)
+    plt.legend()
+    plt.grid(True)
+    plt.show()
