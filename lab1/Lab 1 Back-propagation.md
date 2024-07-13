@@ -399,13 +399,43 @@ Learning rate 設在 0.00001 太小了，原本以為是 epochs 不夠多無法�
 
 ### C. Try without activation functions
 
+#### Without activation function
 
+- Linear data
+
+少數情況會完全 train 不起來，acc = 55%
+
+![image-20240714003906061](/Users/hentci/Library/Application Support/typora-user-images/image-20240714003906061.png)
+
+通常是都 train 得起來，acc = 98%，但還是找不到最佳解
+
+![image-20240714004049748](/Users/hentci/Library/Application Support/typora-user-images/image-20240714004049748.png)
+
+Comparison figure
+
+![image-20240714004157539](/Users/hentci/Library/Application Support/typora-user-images/image-20240714004157539.png)
+
+- XOR data
+
+完全無法 train，acc = 52 %
+
+![image-20240714004245002](/Users/hentci/Library/Application Support/typora-user-images/image-20240714004245002.png)
+
+Comparison figure
+
+![image-20240714004407573](/Users/hentci/Library/Application Support/typora-user-images/image-20240714004407573.png)
+
+loss 會直接突破天際...
 
 ### D. Anything you want to share 
+
+
 
 ## 5. Extra
 
 ### A. Implement different optimizers
+
+
 
 ### B. Implement different activation functions.
 
