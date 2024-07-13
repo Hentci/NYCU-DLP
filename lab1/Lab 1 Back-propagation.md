@@ -316,3 +316,100 @@ loss=0.0000001487 accuracy=100.00%
 
 
 ## 4. Discussion
+
+### A. Try different learning rates
+
+#### For linear data
+
+- lr = 1, acc = 100%
+
+![image-20240713223509486](/Users/hentci/Library/Application Support/typora-user-images/image-20240713223509486.png)
+
+- lr = 0.1, acc = 100%
+
+![image-20240713223529877](/Users/hentci/Library/Application Support/typora-user-images/image-20240713223529877.png)
+
+- lr = 0.0001, acc = 52%
+
+![image-20240713223552682](/Users/hentci/Library/Application Support/typora-user-images/image-20240713223552682.png)
+
+- Comparison figure
+
+![linear_diff_lr](file:///Users/hentci/code/NYCU_DLP/lab1/linear_diff_lr.png)
+
+#### For XOR data
+
+- lr = 1, acc = 100%
+
+![image-20240713224259542](/Users/hentci/Library/Application Support/typora-user-images/image-20240713224259542.png)
+
+- lr = 0.1, acc = 100%
+
+![image-20240713224335753](/Users/hentci/Library/Application Support/typora-user-images/image-20240713224335753.png)
+
+- lr = 0.0001, acc = 52.38%
+
+![image-20240713224356064](/Users/hentci/Library/Application Support/typora-user-images/image-20240713224356064.png)
+
+- Comparison figure
+
+![XOR_diff_lr](file:///Users/hentci/code/NYCU_DLP/lab1/XOR_diff_lr.png)
+
+Learning rate 設在 0.00001 太小了，原本以為是 epochs 不夠多無法讓他收斂，但觀察上面的比較圖後，看起來模型早在 10000 epoch 就沒有辦法降低 loss 了。
+
+### B. Try different numbers of hidden units
+
+#### For linear data
+
+- hidden units = (2, 2) , acc = 100%
+
+![image-20240714000314730](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000314730.png)
+
+- hidden units = (4, 4) , acc = 100%
+
+![image-20240714000446770](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000446770.png)
+
+- hidden units = (16, 16) , acc = 100%
+
+![image-20240714000537600](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000537600.png)
+
+- Comparison figure
+
+![image-20240714000549254](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000549254.png)
+
+#### For XOR data
+
+- hidden units = (2, 2), acc = 100%
+
+![image-20240714000728144](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000728144.png)
+
+- hidden units = (4, 4), acc = 100%
+
+![image-20240714000740738](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000740738.png)
+
+- hidden units = (16, 16), acc = 100%
+
+![image-20240714000757020](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000757020.png)
+
+- Comparison figure
+
+![image-20240714000633958](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000633958.png)
+
+觀察下來，好像 hidden units 設在 (16, 16)，收斂速度會更快一些。
+
+### C. Try without activation functions
+
+
+
+### D. Anything you want to share 
+
+## 5. Extra
+
+### A. Implement different optimizers
+
+### B. Implement different activation functions.
+
+### C. Implement convolutional layers. 
+
+
+
