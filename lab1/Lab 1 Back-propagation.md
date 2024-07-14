@@ -399,7 +399,7 @@ Learning rate 設在 0.00001 太小了，原本以為是 epochs 不夠多無法�
 
 ### C. Try without activation functions
 
-#### Without activation function
+#### Without activation function (acc 還是能反映大致訓練狀況，但僅參考...)
 
 - Linear data
 
@@ -435,9 +435,45 @@ loss 會直接突破天際...
 
 ### A. Implement different optimizers
 
+Adam Optimizer 公式
 
+Adam算法使用以下公式更新权重：
+
+```latex
+•	 m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t 
+•	 v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2 
+•	 \hat{m}_t = \frac{m_t}{1 - \beta_1^t} 
+•	 \hat{v}_t = \frac{v_t}{1 - \beta_2^t} 
+•	 \theta_t = \theta_{t-1} - \frac{\alpha \hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon} 
+```
+
+其中：
+
+	•	 \alpha  是学习率
+	•	 \beta_1, \beta_2  是动量和RMSProp的衰减率参数，通常设置为0.9和0.999
+	•	 \epsilon  是防止除零的小量，通常设置为1e-8
 
 ### B. Implement different activation functions.
+
+將`sigmoid`換成 `relu`
+
+因為對於 ReLU，通常輸出值的範圍為 [0, ∞)。
+
+這邊的實驗將試著根據訓練數據的輸出值來動態調整閾值，即使用輸出值的中位數作為 threshold，但 acc 還是不能參考...
+
+跟 sigmoid 比較起來，好像 relu 的收斂穩定度沒有它來得高。
+
+- Linear data (acc = 98%)
+
+![image-20240714225916830](/Users/hentci/Library/Application Support/typora-user-images/image-20240714225916830.png)
+
+![image-20240714225956630](/Users/hentci/Library/Application Support/typora-user-images/image-20240714225956630.png)
+
+- XOR data (acc = 100%)
+
+![image-20240714230453107](/Users/hentci/Library/Application Support/typora-user-images/image-20240714230453107.png)
+
+![image-20240714230646074](/Users/hentci/Library/Application Support/typora-user-images/image-20240714230646074.png)
 
 ### C. Implement convolutional layers. 
 
