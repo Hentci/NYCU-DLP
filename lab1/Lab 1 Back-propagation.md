@@ -8,11 +8,11 @@
 
 - Linear data
 
-<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715184519138.png" alt="image-20240715184519138" style="zoom:50%;" />
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715184519138.png" alt="image-20240715184519138" style="zoom: 33%;" />
 
 - XOR data
 
-<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715184532394.png" alt="image-20240715184532394" style="zoom:50%;" />
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715184532394.png" alt="image-20240715184532394" style="zoom: 33%;" />
 
 對於 section `2.Experiment setups`和`3.Result of testing`皆由 base code 的 `main.py`來陳述。
 
@@ -170,11 +170,11 @@ def train(X, y, input_size, hidden_size1, hidden_size2, output_size, learning_ra
 
 - Linear data
 
-![linear](file:///Users/hentci/code/NYCU_DLP/lab1/linear.png)
+<img src="file:///Users/hentci/code/NYCU_DLP/lab1/linear.png" alt="linear" style="zoom: 67%;" />
 
 - XOR data
 
-![xor](file:///Users/hentci/code/NYCU_DLP/lab1/xor.png)
+<img src="file:///Users/hentci/code/NYCU_DLP/lab1/xor.png" alt="xor" style="zoom:67%;" />
 
 
 
@@ -317,11 +317,11 @@ loss=0.0000001487 accuracy=100.00%
 
 - Linear data
 
-![linear_loss_curve](file:///Users/hentci/code/NYCU_DLP/lab1/linear_loss_curve.png)
+<img src="file:///Users/hentci/code/NYCU_DLP/lab1/linear_loss_curve.png" alt="linear_loss_curve" style="zoom:67%;" />
 
 - XOR data
 
-![xor_loss_curve](file:///Users/hentci/code/NYCU_DLP/lab1/xor_loss_curve.png)
+<img src="file:///Users/hentci/code/NYCU_DLP/lab1/xor_loss_curve.png" alt="xor_loss_curve" style="zoom:67%;" />
 
 ### D. Anything you want to present
 
@@ -340,7 +340,7 @@ loss=0.0000001487 accuracy=100.00%
       weight_initializer = lambda x, y: np.random.randn(x, y) * np.sqrt(1 / x)
 ```
 
-![image-20240715195730228](/Users/hentci/Library/Application Support/typora-user-images/image-20240715195730228.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715195730228.png" alt="image-20240715195730228" style="zoom:67%;" />
 
 對於 weight initialization 的收斂速度比較為
 
@@ -354,37 +354,37 @@ Normal >= Uniform >> Xavier
 
 - lr = 1, acc = 100%
 
-![image-20240713223509486](/Users/hentci/Library/Application Support/typora-user-images/image-20240713223509486.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240713223509486.png" alt="image-20240713223509486" style="zoom:67%;" />
 
 - lr = 0.1, acc = 100%
 
-![image-20240713223529877](/Users/hentci/Library/Application Support/typora-user-images/image-20240713223529877.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240713223529877.png" alt="image-20240713223529877" style="zoom:67%;" />
 
 - lr = 0.0001, acc = 52%
 
-![image-20240713223552682](/Users/hentci/Library/Application Support/typora-user-images/image-20240713223552682.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240713223552682.png" alt="image-20240713223552682" style="zoom:67%;" />
 
 - Comparison figure
 
-![linear_diff_lr](file:///Users/hentci/code/NYCU_DLP/lab1/linear_diff_lr.png)
+<img src="file:///Users/hentci/code/NYCU_DLP/lab1/linear_diff_lr.png" alt="linear_diff_lr" style="zoom:67%;" />
 
 #### For XOR data
 
 - lr = 1, acc = 100%
 
-![image-20240713224259542](/Users/hentci/Library/Application Support/typora-user-images/image-20240713224259542.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240713224259542.png" alt="image-20240713224259542" style="zoom:67%;" />
 
 - lr = 0.1, acc = 100%
 
-![image-20240713224335753](/Users/hentci/Library/Application Support/typora-user-images/image-20240713224335753.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240713224335753.png" alt="image-20240713224335753" style="zoom:67%;" />
 
 - lr = 0.0001, acc = 52.38%
 
-![image-20240713224356064](/Users/hentci/Library/Application Support/typora-user-images/image-20240713224356064.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240713224356064.png" alt="image-20240713224356064" style="zoom:67%;" />
 
 - Comparison figure
 
-![XOR_diff_lr](file:///Users/hentci/code/NYCU_DLP/lab1/XOR_diff_lr.png)
+<img src="file:///Users/hentci/code/NYCU_DLP/lab1/XOR_diff_lr.png" alt="XOR_diff_lr" style="zoom:67%;" />
 
 Learning rate 設在 0.00001 太小了，原本以為是 epochs 不夠多無法讓他收斂，但觀察上面的比較圖後，看起來模型早在 10000 epoch 就沒有辦法降低 loss 了。
 
@@ -394,37 +394,37 @@ Learning rate 設在 0.00001 太小了，原本以為是 epochs 不夠多無法�
 
 - hidden units = (2, 2) , acc = 100%
 
-![image-20240714000314730](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000314730.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714000314730.png" alt="image-20240714000314730" style="zoom:67%;" />
 
 - hidden units = (4, 4) , acc = 100%
 
-![image-20240714000446770](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000446770.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714000446770.png" alt="image-20240714000446770" style="zoom:67%;" />
 
 - hidden units = (16, 16) , acc = 100%
 
-![image-20240714000537600](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000537600.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714000537600.png" alt="image-20240714000537600" style="zoom:67%;" />
 
 - Comparison figure
 
-![image-20240714000549254](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000549254.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714000549254.png" alt="image-20240714000549254" style="zoom:67%;" />
 
 #### For XOR data
 
 - hidden units = (2, 2), acc = 100%
 
-![image-20240714000728144](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000728144.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714000728144.png" alt="image-20240714000728144" style="zoom:67%;" />
 
 - hidden units = (4, 4), acc = 100%
 
-![image-20240714000740738](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000740738.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714000740738.png" alt="image-20240714000740738" style="zoom:67%;" />
 
 - hidden units = (16, 16), acc = 100%
 
-![image-20240714000757020](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000757020.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714000757020.png" alt="image-20240714000757020" style="zoom:67%;" />
 
 - Comparison figure
 
-![image-20240714000633958](/Users/hentci/Library/Application Support/typora-user-images/image-20240714000633958.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714000633958.png" alt="image-20240714000633958" style="zoom:67%;" />
 
 觀察下來，好像 hidden units 設在 (16, 16)，收斂速度會更快一些。
 
@@ -436,31 +436,68 @@ Learning rate 設在 0.00001 太小了，原本以為是 epochs 不夠多無法�
 
 少數情況會完全 train 不起來，acc = 55%
 
-![image-20240714003906061](/Users/hentci/Library/Application Support/typora-user-images/image-20240714003906061.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714003906061.png" alt="image-20240714003906061" style="zoom:67%;" />
 
 通常是都 train 得起來，acc = 98%，但還是找不到最佳解
 
-![image-20240714004049748](/Users/hentci/Library/Application Support/typora-user-images/image-20240714004049748.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714004049748.png" alt="image-20240714004049748" style="zoom:67%;" />
 
 Comparison figure
 
-![image-20240714004157539](/Users/hentci/Library/Application Support/typora-user-images/image-20240714004157539.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714004157539.png" alt="image-20240714004157539" style="zoom:67%;" />
 
 - XOR data
 
 完全無法 train，acc = 52 %
 
-![image-20240714004245002](/Users/hentci/Library/Application Support/typora-user-images/image-20240714004245002.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714004245002.png" alt="image-20240714004245002" style="zoom:67%;" />
 
 Comparison figure
 
-![image-20240714004407573](/Users/hentci/Library/Application Support/typora-user-images/image-20240714004407573.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714004407573.png" alt="image-20240714004407573" style="zoom:67%;" />
 
 loss 會直接突破天際...
 
 ### D. Anything you want to share 
 
+嘗試了一下不同的 loss function (MSE -> Cross entropy)
 
+$ L(y, \hat{y}) = -\left( y \log(\hat{y}) + (1 - y) \log(1 - \hat{y}) \right) $
+
+```python
+def cross_entropy_loss(y_true, y_pred):
+    epsilon = 1e-12
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+    return -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+```
+
+- Back propgation 的開頭變這樣
+
+```python
+    if loss_type == 'cross_entropy':
+        dA3 = -(y / A3) + (1 - y) / (1 - A3)
+        dZ3 = dA3 * derivative_sigmoid(A3)
+    else:  # mse
+        dZ3 = (A3 - y) * 2 * derivative_sigmoid(A3)
+```
+
+依然可以正常收斂
+
+```
+Epoch 0, Loss (cross_entropy): 0.7435800152511739
+Epoch 5000, Loss (cross_entropy): 0.02526995709076904
+Epoch 10000, Loss (cross_entropy): 0.01036484196405397
+Epoch 15000, Loss (cross_entropy): 0.006214804735750703
+Epoch 20000, Loss (cross_entropy): 0.004303550005177803
+Epoch 25000, Loss (cross_entropy): 0.003226119856241756
+Epoch 30000, Loss (cross_entropy): 0.0025451117385857764
+Epoch 35000, Loss (cross_entropy): 0.0020810679549495576
+Epoch 40000, Loss (cross_entropy): 0.0017474324652610776
+Epoch 45000, Loss (cross_entropy): 0.0014976622444989268
+Final accuracy using cross_entropy: 100.00%
+```
+
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715201819930.png" alt="image-20240715201819930" style="zoom:67%;" />
 
 ## 5. Extra
 
@@ -482,11 +519,11 @@ def momentum_update(weights, grads, velocity, learning_rate, momentum=0.9):
 
 - Linear data (acc = 100%)
 
-![image-20240715181359308](/Users/hentci/Library/Application Support/typora-user-images/image-20240715181359308.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715181359308.png" alt="image-20240715181359308" style="zoom:67%;" />
 
 - XOR data (acc = 100%)
 
-![image-20240715181542201](/Users/hentci/Library/Application Support/typora-user-images/image-20240715181542201.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715181542201.png" alt="image-20240715181542201" style="zoom:67%;" />
 
 #### Adam
 
@@ -517,21 +554,21 @@ def adam_update(weights, grads, m, v, t, learning_rate, beta1=0.9, beta2=0.999, 
 
 - Linear data (acc = 100%)
 
-![image-20240715181457060](/Users/hentci/Library/Application Support/typora-user-images/image-20240715181457060.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715181457060.png" alt="image-20240715181457060" style="zoom:67%;" />
 
 - XOR data (acc = 100%)
 
-![image-20240715181554306](/Users/hentci/Library/Application Support/typora-user-images/image-20240715181554306.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715181554306.png" alt="image-20240715181554306" style="zoom:67%;" />
 
 #### Compare figure
 
 - Linear data
 
-![image-20240715181521664](/Users/hentci/Library/Application Support/typora-user-images/image-20240715181521664.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715181521664.png" alt="image-20240715181521664" style="zoom:67%;" />
 
 - XOR data
 
-![image-20240715181608266](/Users/hentci/Library/Application Support/typora-user-images/image-20240715181608266.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715181608266.png" alt="image-20240715181608266" style="zoom:67%;" />
 
 經過觀察可以發現，收斂速度為 `ADAM`>`MOMENTUM`>`SGD`
 
@@ -553,19 +590,15 @@ def derivative_relu(x):
 
 - Linear data (acc = 98%)
 
-![image-20240714225916830](/Users/hentci/Library/Application Support/typora-user-images/image-20240714225916830.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714225916830.png" alt="image-20240714225916830" style="zoom:67%;" />
 
-![image-20240714225956630](/Users/hentci/Library/Application Support/typora-user-images/image-20240714225956630.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714225956630.png" alt="image-20240714225956630" style="zoom:67%;" />
 
 - XOR data (acc = 100%)
 
-![image-20240714230453107](/Users/hentci/Library/Application Support/typora-user-images/image-20240714230453107.png)
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714230453107.png" alt="image-20240714230453107" style="zoom:67%;" />
 
-![image-20240714230646074](/Users/hentci/Library/Application Support/typora-user-images/image-20240714230646074.png)
-
-### C. Implement convolutional layers. 
-
-
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240714230646074.png" alt="image-20240714230646074" style="zoom:67%;" />
 
 ## Reference
 
