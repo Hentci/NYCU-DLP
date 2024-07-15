@@ -71,7 +71,7 @@ def back_propagation(X, y, weights, Z1, A1, Z2, A2, Z3, A3, learning_rate):
     m = y.shape[0] # number of samples
     
     # compute gradients
-    dZ3 = (A3 - y) * 2
+    dZ3 = (A3 - y) * 2 * derivative_sigmoid(A3)
     dW3 = np.dot(A2.T, dZ3) / m
     db3 = np.sum(dZ3, axis=0, keepdims=True) / m # 沿著 row 求和，並保持維度
     
