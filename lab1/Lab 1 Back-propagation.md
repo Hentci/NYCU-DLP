@@ -435,31 +435,88 @@ loss 會直接突破天際...
 
 ### A. Implement different optimizers
 
-Adam Optimizer 公式
+#### Momentum
 
-Adam算法使用以下公式更新权重：
+```python
+def momentum_update(weights, grads, velocity, learning_rate, momentum=0.9):
+    for key in weights.keys():
+        velocity[key] = momentum * velocity[key] - learning_rate * grads[key]
+        weights[key] += velocity[key]
+    return weights, velocity
+```
 
-```latex
-•	 m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t 
-•	 v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2 
-•	 \hat{m}_t = \frac{m_t}{1 - \beta_1^t} 
-•	 \hat{v}_t = \frac{v_t}{1 - \beta_2^t} 
-•	 \theta_t = \theta_{t-1} - \frac{\alpha \hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon} 
+`velocity[key]` 表示上一次更新的速度。
+
+(如果更新方向和上次相反，這次更新速度會變慢，反之則變快。)
+
+- Linear data (acc = 100%)
+
+![image-20240715181359308](/Users/hentci/Library/Application Support/typora-user-images/image-20240715181359308.png)
+
+- XOR data (acc = 100%)
+
+![image-20240715181542201](/Users/hentci/Library/Application Support/typora-user-images/image-20240715181542201.png)
+
+#### Adam
+
+```python
+def adam_update(weights, grads, m, v, t, learning_rate, beta1=0.9, beta2=0.999, epsilon=1e-8):
+    m_hat = {}
+    v_hat = {}
+    for key in weights.keys():
+        m[key] = beta1 * m[key] + (1 - beta1) * grads[key]
+        v[key] = beta2 * v[key] + (1 - beta2) * np.square(grads[key])
+        m_hat[key] = m[key] / (1 - beta1 ** t)
+        v_hat[key] = v[key] / (1 - beta2 ** t)
+        weights[key] -= learning_rate * m_hat[key] / (np.sqrt(v_hat[key]) + epsilon)
+    return weights, m, v
 ```
 
 其中：
 
-	•	 \alpha  是学习率
-	•	 \beta_1, \beta_2  是动量和RMSProp的衰减率参数，通常设置为0.9和0.999
-	•	 \epsilon  是防止除零的小量，通常设置为1e-8
+	•	weights: 當前的權重參數。
+	•	grads: 當前計算出的梯度。
+	•	m: 一階矩估計（動量）。
+	•	v: 二階矩估計（RMSProp）。
+	•	t: 當前的時間步（迭代次數）。
+	•	learning_rate: 學習率。
+	•	beta1: 一階矩估計的衰減率，通常設為 0.9。
+	•	beta2: 二階矩估計的衰減率，通常設為 0.999。
+	•	epsilon: 防止除零的小數值，通常設為 1e-8。
+
+- Linear data (acc = 100%)
+
+![image-20240715181457060](/Users/hentci/Library/Application Support/typora-user-images/image-20240715181457060.png)
+
+- XOR data (acc = 100%)
+
+![image-20240715181554306](/Users/hentci/Library/Application Support/typora-user-images/image-20240715181554306.png)
+
+#### Compare figure
+
+- Linear data
+
+![image-20240715181521664](/Users/hentci/Library/Application Support/typora-user-images/image-20240715181521664.png)
+
+- XOR data
+
+![image-20240715181608266](/Users/hentci/Library/Application Support/typora-user-images/image-20240715181608266.png)
+
+經過觀察可以發現，收斂速度為 `ADAM`>`MOMENTUM`>`SGD`
 
 ### B. Implement different activation functions.
 
 將`sigmoid`換成 `relu`
 
-因為對於 ReLU，通常輸出值的範圍為 [0, ∞)。
+```python
+def relu(x):
+    return np.maximum(0, x)
 
-這邊的實驗將試著根據訓練數據的輸出值來動態調整閾值，即使用輸出值的中位數作為 threshold，但 acc 還是不能參考...
+def derivative_relu(x):
+    return np.where(x > 0, 1, 0)
+```
+
+因為對於 ReLU，通常輸出值的範圍為 [0, ∞)，這邊的實驗將試著根據訓練數據的輸出值來動態調整閾值，即使用輸出值的中位數作為 threshold，但 acc 還是不能參考...
 
 跟 sigmoid 比較起來，好像 relu 的收斂穩定度沒有它來得高。
 
@@ -479,3 +536,8 @@ Adam算法使用以下公式更新权重：
 
 
 
+## Reference
+
+- https://hackmd.io/@allen108108/H1l4zqtp4 (Adagrad、RMSprop、Momentum and Adam – 特殊的學習率調整方式)
+- https://www.brilliantcode.net/1670/convolutional-neural-networks-4-backpropagation-in-kernels-of-cnns/ (卷積核的Back propagation)
+- ChatGPT

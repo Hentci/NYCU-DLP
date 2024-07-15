@@ -5,8 +5,8 @@ from tools import generate_linear, generate_XOR_easy, sigmoid, derivative_sigmoi
 
 def initialize_weights(input_size, hidden_size1, hidden_size2, output_size):
     weights = {
-        'W1': np.random.randn(input_size, hidden_size1), # shape: (input_size, hidden_size1)
-        'b1': np.zeros((1, hidden_size1)), # shape: (1, hidden_size1)
+        'W1': np.random.randn(input_size, hidden_size1),
+        'b1': np.zeros((1, hidden_size1)),
         'W2': np.random.randn(hidden_size1, hidden_size2),
         'b2': np.zeros((1, hidden_size2)),
         'W3': np.random.randn(hidden_size2, output_size),
@@ -23,7 +23,6 @@ def forward_propagation(X, weights):
     A3 = sigmoid(Z3)
     return Z1, A1, Z2, A2, Z3, A3
 
-# cost(loss) function: MSE
 def compute_loss(y_true, y_pred):
     return np.mean((y_true - y_pred) ** 2)
 
@@ -37,6 +36,12 @@ def adam_update(weights, grads, m, v, t, learning_rate, beta1=0.9, beta2=0.999, 
         v_hat[key] = v[key] / (1 - beta2 ** t)
         weights[key] -= learning_rate * m_hat[key] / (np.sqrt(v_hat[key]) + epsilon)
     return weights, m, v
+
+def momentum_update(weights, grads, velocity, learning_rate, momentum=0.9):
+    for key in weights.keys():
+        velocity[key] = momentum * velocity[key] - learning_rate * grads[key]
+        weights[key] += velocity[key]
+    return weights, velocity
 
 def back_propagation(X, y, weights, Z1, A1, Z2, A2, Z3, A3):
     m = y.shape[0]
@@ -71,6 +76,8 @@ def train(X, y, input_size, hidden_size1, hidden_size2, output_size, learning_ra
         m = {key: np.zeros_like(value) for key, value in weights.items()}
         v = {key: np.zeros_like(value) for key, value in weights.items()}
         t = 0
+    elif optimizer == 'momentum':
+        velocity = {key: np.zeros_like(value) for key, value in weights.items()}
 
     for epoch in range(epochs):
         Z1, A1, Z2, A2, Z3, A3 = forward_propagation(X, weights)
@@ -84,7 +91,9 @@ def train(X, y, input_size, hidden_size1, hidden_size2, output_size, learning_ra
         elif optimizer == 'adam':
             t += 1
             weights, m, v = adam_update(weights, grads, m, v, t, learning_rate)
-        
+        elif optimizer == 'momentum':
+            weights, velocity = momentum_update(weights, grads, velocity, learning_rate)
+
         if epoch % 5000 == 0:
             print(f'Epoch {epoch}, Loss: {loss}')
     
@@ -106,7 +115,7 @@ def show_result(x, y, pred_y, plot_title):
     plt.subplot(1, 2, 2)
     plt.title(plot_title, fontsize=18)
     for i in range(x.shape[0]):
-        if pred_y[i] < 0.5: # sigmoid output, 0.5 is the threshold
+        if pred_y[i] < 0.5:
             plt.plot(x[i][0], x[i][1], 'ro')
         else:
             plt.plot(x[i][0], x[i][1], 'bo')
@@ -129,7 +138,6 @@ def plot_multiple_loss_curves(loss_histories, labels, title):
     plt.grid(True)
     plt.show()
 
-
 X_linear, y_linear = generate_linear()
 X_xor, y_xor = generate_XOR_easy()
 input_size = 2
@@ -143,7 +151,7 @@ def train_and_compare(X, y, input_size, hidden_size1, hidden_size2, output_size,
     loss_histories = []
     labels = []
 
-    for optimizer in ['sgd', 'adam']:
+    for optimizer in ['sgd', 'momentum', 'adam']:
         print(f"Training with {optimizer.upper()} optimizer for {title} Data")
         weights, loss_history = train(X, y, input_size, hidden_size1, hidden_size2, output_size, learning_rate, epochs, optimizer=optimizer)
         loss_histories.append(loss_history)
@@ -157,8 +165,6 @@ def train_and_compare(X, y, input_size, hidden_size1, hidden_size2, output_size,
 
     plot_multiple_loss_curves(loss_histories, labels, title=f'Loss Curves for {title} Data')
 
-
 train_and_compare(X_linear, y_linear, input_size, hidden_size1, hidden_size2, output_size, learning_rate, epochs, title="Linear")
-
 
 train_and_compare(X_xor, y_xor, input_size, hidden_size1, hidden_size2, output_size, learning_rate, epochs, title="XOR")
