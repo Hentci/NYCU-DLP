@@ -4,7 +4,19 @@
 
 ## 1. Introduction
 
+在本報告中，我們將探討使用反向傳播算法訓練神經網絡的過程與結果。在 section `4.Discussion`和`5.Extra`，我們將利用不同的學習率、激活函數、和優化器等等來訓練，目的是評估這些因素對模型性能的影響。通過詳細的測試和討論，我們將展示這些方法如何影響網絡在處理**Linear數據**和**XOR數據**時的學習和預測能力，以下為Linear數據和XOR數據的呈現方式:
+
+- Linear data
+
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715184519138.png" alt="image-20240715184519138" style="zoom:50%;" />
+
+- XOR data
+
+<img src="/Users/hentci/Library/Application Support/typora-user-images/image-20240715184532394.png" alt="image-20240715184532394" style="zoom:50%;" />
+
 對於 section `2.Experiment setups`和`3.Result of testing`皆由 base code 的 `main.py`來陳述。
+
+至於 section `4.Discussion`和`5.Extra`則會另外寫成`diff_`開頭的 codes。
 
 ## 2. Experiment setups
 
@@ -313,7 +325,26 @@ loss=0.0000001487 accuracy=100.00%
 
 ### D. Anything you want to present
 
+對於不同的 weight 初始化方法，我做了以下實驗比較:
 
+- Normal (原始的方法)
+- Uniform
+- Xavier
+
+```python
+  if method == 'normal':
+      weight_initializer = lambda x, y: np.random.randn(x, y)
+  elif method == 'uniform':
+      weight_initializer = lambda x, y: np.random.uniform(-1.0, 1.0, (x, y))
+  elif method == 'xavier':
+      weight_initializer = lambda x, y: np.random.randn(x, y) * np.sqrt(1 / x)
+```
+
+![image-20240715195730228](/Users/hentci/Library/Application Support/typora-user-images/image-20240715195730228.png)
+
+對於 weight initialization 的收斂速度比較為
+
+Normal >= Uniform >> Xavier 
 
 ## 4. Discussion
 
