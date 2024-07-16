@@ -98,7 +98,7 @@ def back_propagation(X, y, weights, Z1, A1, Z2, A2, Z3, A3, learning_rate):
 
 首先定義$dZ3$如下
 
- $dZ3 = \frac{\partial L}{\partial Z3}$ ，$dZ3 = 2 * (A3 - y)$ 
+ $dZ3 = \frac{\partial L}{\partial Z3}$ ，$dZ3 = 2 * (A3 - y)$ * derivative_sigmoid(A3)
 
 接著我們需要計算損失函數 (L) 對 權重(W3) 的梯度 ($dW3 = \frac{\partial L}{\partial W3}$)。
 
