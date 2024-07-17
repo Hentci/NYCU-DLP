@@ -56,7 +56,7 @@ def test_sccnet_LOSO(model_path, batch_size):
     return accuracy
 
 if __name__ == '__main__':
-    model_path = './sccnet_model.pth'
+    model_path = './model_weights/sccnet_LOSO_model.pth'
     batch_size = 64
     accuracy = test_sccnet_LOSO(model_path, batch_size)
     print(f'Test Accuracy: {accuracy:.2f}%')
