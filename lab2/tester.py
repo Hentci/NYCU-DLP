@@ -7,16 +7,16 @@ from model.SCCNet import SCCNet  # 確保 SCCNet 模型定義在 SCCNet.py 中
 from Dataloader import MIBCI2aDataset  # 確保數據加載器定義在 dataloader.py 中
 from utils import load_model, calculate_accuracy, plot_confusion_matrix
 
-def test_sccnet(model_path, batch_size):
+def test_sccnet_LOSO(model_path, batch_size):
     # 設置設備（GPU 或 CPU）
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # 加載數據集
-    test_dataset = MIBCI2aDataset(mode='test')
+    test_dataset = MIBCI2aDataset(mode='LOSO_test')
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     # 創建模型
-    model = SCCNet(numClasses=4, timeSample=125, Nu=22, C=22, Nc=22, Nt=1, dropoutRate=0.5).to(device)
+    model = SCCNet(numClasses=4, timeSample=438, Nu=22, Nc=20,  dropoutRate=0.5).to(device)
 
     # 加載模型權重
     load_model(model, model_path)
@@ -57,6 +57,6 @@ def test_sccnet(model_path, batch_size):
 
 if __name__ == '__main__':
     model_path = './sccnet_model.pth'
-    batch_size = 32
-    accuracy = test_sccnet(model_path, batch_size)
+    batch_size = 64
+    accuracy = test_sccnet_LOSO(model_path, batch_size)
     print(f'Test Accuracy: {accuracy:.2f}%')

@@ -29,3 +29,37 @@ SCCNet
 總結
 
 SCCNet 的架構設計旨在通過多層卷積操作來提取 EEG 數據中的空間和時間特徵，並通過批量正規化和 dropout 技術來增強模型的穩健性和防止過擬合。最終的 softmax 分類層能夠將處理後的特徵映射到具體的運動想像任務類別上。
+
+
+
+### 實驗紀錄 (batch = 64)
+
+- LOSO
+
+​	epochs = 500, lr = 0.01, acc = 50.69
+
+​	epochs = 300, lr = 0.001, acc = 62.2
+
+​	epochs = 200, lr_scheduler(20, 0.1), acc = 
+
+- SD
+
+​	epochs = 100, lr = 0.001, acc = 47.31
+
+​	epochs = 200, lr = 0.001, acc = 47.48
+
+​	epochs = 100, lr_scheduler(20, 0.1), acc = 42.6
+
+​	loss_curve變穩定了 (但acc變更低....)
+
+![image-20240717211814511](/Users/hentci/Library/Application Support/typora-user-images/image-20240717211814511.png)
+
+​	epochs = 200, lr_scheduler(20, 0.1), acc = 41.84...
+
+​	epochs = 100, lr_scheduler(20, 0.5), acc = 49.52
+
+​	epochs = 150, lr_scheduler(20, 0.8) (0.1 開始 decay), acc = 50.78
+
+​	epochs = 300, lr_scheduler(20, 0.9) (0.001 開始 decay), acc =  46.27
+
+- LOSO_finetune

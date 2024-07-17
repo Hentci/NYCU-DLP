@@ -23,14 +23,21 @@ class MIBCI2aDataset(torch.utils.data.Dataset):
 
     def __init__(self, mode):
         # 根據不同的模式設置文件路徑
-        assert mode in ['train', 'test', 'finetune']
-        if mode == 'train':
-            self.features = self._getFeatures(filePath='../lab2_dataset/SD_train/features/')
-            self.labels = self._getLabels(filePath='../lab2_dataset/SD_train/labels/')
+        assert mode in ['LOSO_train', 'LOSO_test', 'finetune', 'SD_train', 'SD_test']
+        self.mode = mode
+        if mode == 'LOSO_train':
+            self.features = self._getFeatures(filePath='../lab2_dataset/LOSO_train/features/')
+            self.labels = self._getLabels(filePath='../lab2_dataset/LOSO_train/labels/')
         elif mode == 'finetune':
             self.features = self._getFeatures(filePath='../lab2_dataset/FT/features/')
             self.labels = self._getLabels(filePath='../lab2_dataset/FT/labels/')
-        elif mode == 'test':
+        elif mode == 'LOSO_test':
+            self.features = self._getFeatures(filePath='../lab2_dataset/LOSO_test/features/')
+            self.labels = self._getLabels(filePath='../lab2_dataset/LOSO_test/labels/')
+        elif mode == 'SD_train':
+            self.features = self._getFeatures(filePath='../lab2_dataset/SD_train/features/')
+            self.labels = self._getLabels(filePath='../lab2_dataset/SD_train/labels/')
+        elif mode == 'SD_test':
             self.features = self._getFeatures(filePath='../lab2_dataset/SD_test/features/')
             self.labels = self._getLabels(filePath='../lab2_dataset/SD_test/labels/')
 
@@ -47,7 +54,32 @@ class MIBCI2aDataset(torch.utils.data.Dataset):
             idx = idx.tolist()
         feature = self.features[idx]
         label = self.labels[idx]
+        
+        # 如果處於訓練模式，進行數據增強
+        if self.mode == 'train':
+            feature = self.augment(feature)
+        
         return torch.tensor(feature, dtype=torch.float32), torch.tensor(label, dtype=torch.long)
+
+    def augment(self, feature):
+        # 添加隨機噪聲
+        if np.random.rand() > 0.5:
+            noise = np.random.normal(0, 0.1, feature.shape)
+            feature = feature + noise
+
+        # 隨機平移
+        if np.random.rand() > 0.5:
+            shift = np.random.randint(-10, 10)
+            feature = np.roll(feature, shift, axis=-1)
+
+        # 隨機裁剪並填充
+        if np.random.rand() > 0.5:
+            crop_size = np.random.randint(400, 438)
+            start = np.random.randint(0, feature.shape[-1] - crop_size)
+            cropped_feature = feature[:, start:start+crop_size]
+            feature = np.pad(cropped_feature, ((0, 0), (0, feature.shape[-1] - crop_size)), 'constant')
+
+        return feature
 
 # 測試用例
 if __name__ == '__main__':
