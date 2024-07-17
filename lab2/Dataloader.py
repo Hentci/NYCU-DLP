@@ -56,7 +56,8 @@ class MIBCI2aDataset(torch.utils.data.Dataset):
         label = self.labels[idx]
         
         # 如果處於訓練模式，進行數據增強
-        if self.mode == 'train':
+        if self.mode == 'LOSO_train' or self.mode == 'finetune' or self.mode == 'SD_train':
+            # print('augemntation!')
             feature = self.augment(feature)
         
         return torch.tensor(feature, dtype=torch.float32), torch.tensor(label, dtype=torch.long)
