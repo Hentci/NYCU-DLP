@@ -84,6 +84,6 @@ class MIBCI2aDataset(torch.utils.data.Dataset):
 
 # 測試用例
 if __name__ == '__main__':
-    dataset = MIBCI2aDataset(mode='train')
+    dataset = MIBCI2aDataset(mode='LOSO_train')
     print(f"Number of samples: {len(dataset)}")
     print(f"Feature shape: {dataset[0][0].shape}, Label: {dataset[0][1]}")

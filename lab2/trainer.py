@@ -4,6 +4,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from model.SCCNet import SCCNet  # 確保 SCCNet 模型定義在 SCCNet.py 中
 from Dataloader import MIBCI2aDataset  # 確保數據加載器定義在 dataloader.py 中
+from tester import test_sccnet_LOSO
 from utils import plot_loss_curve  # 從 utils.py 中導入 plot_loss_curve 函數
 
 def train_sccnet_LOSO(num_epochs, batch_size, learning_rate, dropout_rate, model_save_path):
@@ -16,12 +17,12 @@ def train_sccnet_LOSO(num_epochs, batch_size, learning_rate, dropout_rate, model
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
     # 創建模型
-    model = SCCNet(numClasses=4, timeSample=438, Nu=22, Nc=20, dropoutRate=dropout_rate).to(device)
+    model = SCCNet(numClasses=4, timeSample=438,  dropoutRate=dropout_rate).to(device)
 
     # 定義損失函數和優化器
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.8)  # 添加學習率調度器，每 20 個 epoch 乘以 0.1
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.0001)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.9) 
 
     # 訓練模型
     model.train()
@@ -56,6 +57,13 @@ def train_sccnet_LOSO(num_epochs, batch_size, learning_rate, dropout_rate, model
         current_lr = optimizer.param_groups[0]['lr']
         print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}, Learning Rate: {current_lr}')
 
+        # 保存模型權重
+        torch.save(model.state_dict(), model_save_path)
+        acc = test_sccnet_LOSO(model_save_path, 64)
+        print('acc =', acc)
+        if acc > 63:
+            exit(0)
+
         # 更新學習率
         scheduler.step()
 
@@ -67,10 +75,10 @@ def train_sccnet_LOSO(num_epochs, batch_size, learning_rate, dropout_rate, model
     plot_loss_curve(loss_history, title='Training Loss Curve')
 
 if __name__ == '__main__':
-    num_epochs = 500
-    batch_size = 32
+    num_epochs = 1000
+    batch_size = 64
     learning_rate = 0.001
-    dropout_rate = 0.5
+    dropout_rate = 0.8
     model_save_path = './model_weights/sccnet_LOSO_model.pth'
 
     train_sccnet_LOSO(num_epochs, batch_size, learning_rate, dropout_rate, model_save_path)

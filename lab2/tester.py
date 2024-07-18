@@ -16,7 +16,7 @@ def test_sccnet_LOSO(model_path, batch_size):
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     # 創建模型
-    model = SCCNet(numClasses=4, timeSample=438, Nu=22, Nc=20,  dropoutRate=0.5).to(device)
+    model = SCCNet(numClasses=4, timeSample=438, dropoutRate=0.5).to(device)
 
     # 加載模型權重
     load_model(model, model_path)
@@ -57,7 +57,7 @@ def test_sccnet_LOSO(model_path, batch_size):
     return accuracy
 
 if __name__ == '__main__':
-    model_path = './model_weights/sccnet_LOSO_model.pth'
-    batch_size = 32
+    model_path = './model_weights/LOSO60.07.pth'
+    batch_size = 64
     accuracy = test_sccnet_LOSO(model_path, batch_size)
     print(f'Test Accuracy: {accuracy:.2f}%')
