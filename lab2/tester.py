@@ -37,6 +37,7 @@ def test_sccnet_LOSO(model_path, batch_size):
 
             # 前向傳播
             outputs = model(inputs)
+            outputs = nn.functional.softmax(outputs, dim=1)
             _, predicted = torch.max(outputs.data, 1)
 
             # 累計正確預測和總樣本數
@@ -57,6 +58,6 @@ def test_sccnet_LOSO(model_path, batch_size):
 
 if __name__ == '__main__':
     model_path = './model_weights/sccnet_LOSO_model.pth'
-    batch_size = 64
+    batch_size = 32
     accuracy = test_sccnet_LOSO(model_path, batch_size)
     print(f'Test Accuracy: {accuracy:.2f}%')

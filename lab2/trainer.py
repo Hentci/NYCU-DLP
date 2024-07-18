@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from model.SCCNet import SCCNet, SCCNet_v2  # 確保 SCCNet 模型定義在 SCCNet.py 中
+from model.SCCNet import SCCNet  # 確保 SCCNet 模型定義在 SCCNet.py 中
 from Dataloader import MIBCI2aDataset  # 確保數據加載器定義在 dataloader.py 中
 from utils import plot_loss_curve  # 從 utils.py 中導入 plot_loss_curve 函數
 
@@ -21,7 +21,7 @@ def train_sccnet_LOSO(num_epochs, batch_size, learning_rate, dropout_rate, model
     # 定義損失函數和優化器
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=1)  # 添加學習率調度器，每 20 個 epoch 乘以 0.1
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.8)  # 添加學習率調度器，每 20 個 epoch 乘以 0.1
 
     # 訓練模型
     model.train()
@@ -67,8 +67,8 @@ def train_sccnet_LOSO(num_epochs, batch_size, learning_rate, dropout_rate, model
     plot_loss_curve(loss_history, title='Training Loss Curve')
 
 if __name__ == '__main__':
-    num_epochs = 300
-    batch_size = 64
+    num_epochs = 500
+    batch_size = 32
     learning_rate = 0.001
     dropout_rate = 0.5
     model_save_path = './model_weights/sccnet_LOSO_model.pth'
