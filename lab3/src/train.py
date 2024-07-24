@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from torch import nn
 from torchvision import transforms
 from models.unet import UNet
+from models.resnet34_unet import Res34_UNet
 from oxford_pet import SimpleOxfordPetDataset
 from utils import dice_score
 
@@ -27,7 +28,15 @@ def train(args):
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
     
     # Initialize model, loss function, and optimizer
-    model = UNet(in_channels=3, out_channels=1).to(device)
+    
+    'Choose model'
+    if args.model_type == 'unet':
+        model = UNet(in_channels=3, out_channels=1).to(device)
+        save_path = '../saved_models/unet_best_model.pth'
+    else:
+        model = Res34_UNet(in_channels=3, out_channels=1).to(device)
+        save_path = '../saved_models/res34_best_model.pth'
+    
     criterion = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     
@@ -74,15 +83,16 @@ def train(args):
         # Save the model if it has the best validation loss so far
         if val_loss < best_val_loss:
             best_val_loss = val_loss
-            torch.save(model.state_dict(), '../saved_models/best_model.pth')
+            torch.save(model.state_dict(), save_path)
             print(f'Saved best model with val loss: {val_loss:.4f}')
 
 def get_args():
     parser = argparse.ArgumentParser(description='Train the model on images and target masks')
     parser.add_argument('--data_path', type=str, help='path of the input data')
-    parser.add_argument('--epochs', '-e', type=int, default=10, help='number of epochs')
-    parser.add_argument('--batch_size', '-b', type=int, default=4, help='batch size')
+    parser.add_argument('--epochs', '-e', type=int, default=20, help='number of epochs')
+    parser.add_argument('--batch_size', '-b', type=int, default=16, help='batch size')
     parser.add_argument('--learning-rate', '-lr', type=float, default=1e-5, help='learning rate')
+    parser.add_argument('--model_type', type=str, default='unet', help='unet or res34')
     
     return parser.parse_args()
 
