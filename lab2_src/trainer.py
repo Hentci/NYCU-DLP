@@ -197,7 +197,7 @@ if __name__ == '__main__':
     dropout_rate = 0.8
     model_save_path = './model_weights/sccnet_FT_model.pth'
 
-    train_sccnet_LOSO(num_epochs, batch_size, learning_rate, dropout_rate, model_save_path)
+    # train_sccnet_LOSO(num_epochs, batch_size, learning_rate, dropout_rate, model_save_path)
     # train_sccnet_SD(num_epochs, batch_size, learning_rate, dropout_rate, model_save_path)
-    # train_sccnet_LOSOFT(num_epochs, batch_size, learning_rate, dropout_rate, model_save_path)
+    train_sccnet_LOSOFT(num_epochs, batch_size, learning_rate, dropout_rate, model_save_path)
     
