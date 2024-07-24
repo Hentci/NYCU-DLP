@@ -6,10 +6,11 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 from urllib.request import urlretrieve
+from torchvision.transforms import functional as F
+
 
 class OxfordPetDataset(torch.utils.data.Dataset):
     def __init__(self, root, mode="train", transform=None):
-
         assert mode in {"train", "valid", "test"}
 
         self.root = root
@@ -25,19 +26,23 @@ class OxfordPetDataset(torch.utils.data.Dataset):
         return len(self.filenames)
 
     def __getitem__(self, idx):
-
         filename = self.filenames[idx]
         image_path = os.path.join(self.images_directory, filename + ".jpg")
         mask_path = os.path.join(self.masks_directory, filename + ".png")
 
         image = np.array(Image.open(image_path).convert("RGB"))
-
         trimap = np.array(Image.open(mask_path))
         mask = self._preprocess_mask(trimap)
 
         sample = dict(image=image, mask=mask, trimap=trimap)
-        if self.transform is not None:
-            sample = self.transform(**sample)
+
+        # Apply transform if specified
+        if self.transform:
+            image = self.transform(image)
+            mask = torch.from_numpy(np.array(mask)).unsqueeze(0).float()
+        else:
+            image = F.to_tensor(image)
+            mask = torch.from_numpy(np.array(mask)).unsqueeze(0).float()
 
         return sample
 
@@ -62,7 +67,6 @@ class OxfordPetDataset(torch.utils.data.Dataset):
 
     @staticmethod
     def download(root):
-
         # load images
         filepath = os.path.join(root, "images.tar.gz")
         download_url(
@@ -79,10 +83,8 @@ class OxfordPetDataset(torch.utils.data.Dataset):
         )
         extract_archive(filepath)
 
-
 class SimpleOxfordPetDataset(OxfordPetDataset):
     def __getitem__(self, *args, **kwargs):
-
         sample = super().__getitem__(*args, **kwargs)
 
         # resize images
@@ -94,16 +96,16 @@ class SimpleOxfordPetDataset(OxfordPetDataset):
         sample["image"] = np.moveaxis(image, -1, 0)
         sample["mask"] = np.expand_dims(mask, 0)
         sample["trimap"] = np.expand_dims(trimap, 0)
+        
+        # print(sample)
 
         return sample
-
 
 class TqdmUpTo(tqdm):
     def update_to(self, b=1, bsize=1, tsize=None):
         if tsize is not None:
             self.total = tsize
         self.update(b * bsize - self.n)
-
 
 def download_url(url, filepath):
     directory = os.path.dirname(os.path.abspath(filepath))
@@ -121,7 +123,6 @@ def download_url(url, filepath):
         urlretrieve(url, filename=filepath, reporthook=t.update_to, data=None)
         t.total = t.n
 
-
 def extract_archive(filepath):
     extract_dir = os.path.dirname(os.path.abspath(filepath))
     dst_dir = os.path.splitext(filepath)[0]
@@ -129,6 +130,5 @@ def extract_archive(filepath):
         shutil.unpack_archive(filepath, extract_dir)
 
 def load_dataset(data_path, mode):
-    # implement the load dataset function here
-
-    assert False, "Not implemented yet!"
+    dataset = SimpleOxfordPetDataset(root=data_path, mode=mode)
+    return dataset

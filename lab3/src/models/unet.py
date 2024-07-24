@@ -1,3 +1,75 @@
 # Implement your UNet model here
 
-assert False, "Not implemented yet!"
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class UNet(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(UNet, self).__init__()
+
+        # Contracting path (Encoder)
+        self.enc1 = self.conv_block(in_channels, 64)
+        self.enc2 = self.conv_block(64, 128)
+        self.enc3 = self.conv_block(128, 256)
+        self.enc4 = self.conv_block(256, 512)
+        self.enc5 = self.conv_block(512, 1024)
+
+        # Expansive path (Decoder)
+        self.upconv4 = nn.ConvTranspose2d(1024, 512, kernel_size=2, stride=2)
+        self.dec4 = self.conv_block(1024, 512)
+        self.upconv3 = nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2)
+        self.dec3 = self.conv_block(512, 256)
+        self.upconv2 = nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2)
+        self.dec2 = self.conv_block(256, 128)
+        self.upconv1 = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)
+        self.dec1 = self.conv_block(128, 64)
+
+        # Final layer
+        self.conv_last = nn.Conv2d(64, out_channels, kernel_size=1)
+
+    def conv_block(self, in_channels, out_channels):
+        block = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True)
+        )
+        return block
+
+    def forward(self, x):
+        # Encoder
+        enc1 = self.enc1(x)
+        enc2 = self.enc2(self.down(enc1))
+        enc3 = self.enc3(self.down(enc2))
+        enc4 = self.enc4(self.down(enc3))
+        enc5 = self.enc5(self.down(enc4))
+
+        # Decoder
+        dec4 = self.upconv4(enc5)
+        dec4 = torch.cat((dec4, enc4), dim=1)
+        dec4 = self.dec4(dec4)
+
+        dec3 = self.upconv3(dec4)
+        dec3 = torch.cat((dec3, enc3), dim=1)
+        dec3 = self.dec3(dec3)
+
+        dec2 = self.upconv2(dec3)
+        dec2 = torch.cat((dec2, enc2), dim=1)
+        dec2 = self.dec2(dec2)
+
+        dec1 = self.upconv1(dec2)
+        dec1 = torch.cat((dec1, enc1), dim=1)
+        dec1 = self.dec1(dec1)
+
+        return self.conv_last(dec1)
+
+    def down(self, x):
+        return F.max_pool2d(x, 2)
+
+if __name__ == "__main__":
+    # Test the implementation
+    model = UNet(in_channels=3, out_channels=1)  # RGB input, binary output
+    x = torch.randn(1, 3, 256, 256)  # Example input
+    output = model(x)
+    print(output.shape)  # Should print torch.Size([1, 1, 256, 256])
