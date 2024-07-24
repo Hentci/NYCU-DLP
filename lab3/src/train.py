@@ -7,6 +7,7 @@ from torch import nn
 from torchvision import transforms
 from models.unet import UNet
 from oxford_pet import SimpleOxfordPetDataset
+from utils import dice_score
 
 def train(args):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -53,6 +54,7 @@ def train(args):
         # Validation loop
         model.eval()
         val_loss = 0.0
+        val_dice = 0.0
         with torch.no_grad():
             for batch in val_loader:
                 images = batch['image'].float().to(device)
@@ -61,10 +63,13 @@ def train(args):
                 outputs = model(images)
                 loss = criterion(outputs, masks)
                 val_loss += loss.item() * images.size(0)
+                
+                val_dice += dice_score(outputs, masks).item() * images.size(0)
         
         val_loss /= len(val_loader.dataset)
+        val_dice /= len(val_loader.dataset)
         
-        print(f'Epoch {epoch+1}/{args.epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}')
+        print(f'Epoch {epoch+1}/{args.epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, Val Dice: {val_dice:.4f}')
         
         # Save the model if it has the best validation loss so far
         if val_loss < best_val_loss:

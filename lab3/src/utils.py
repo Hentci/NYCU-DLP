@@ -2,24 +2,18 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 
-def dice_score(pred_mask, gt_mask, smooth=1e-6):
-    """
-    Calculate the Dice score, which is a measure of overlap between two samples.
+import torch
+
+def dice_score(pred_mask, gt_mask):
+    smooth = 1e-5
+    pred_mask = torch.sigmoid(pred_mask)
+    pred_mask = (pred_mask > 0.5).float()
     
-    Args:
-    pred_mask (torch.Tensor or np.ndarray): Predicted binary mask
-    gt_mask (torch.Tensor or np.ndarray): Ground truth binary mask
-    smooth (float): Smoothing factor to avoid division by zero
+    intersection = (pred_mask * gt_mask).sum(dim=(2, 3))
+    union = pred_mask.sum(dim=(2, 3)) + gt_mask.sum(dim=(2, 3))
     
-    Returns:
-    float: Dice score
-    """
-    pred_mask = pred_mask.float() if isinstance(pred_mask, torch.Tensor) else torch.tensor(pred_mask, dtype=torch.float32)
-    gt_mask = gt_mask.float() if isinstance(gt_mask, torch.Tensor) else torch.tensor(gt_mask, dtype=torch.float32)
-    
-    intersection = (pred_mask * gt_mask).sum()
-    dice = (2. * intersection + smooth) / (pred_mask.sum() + gt_mask.sum() + smooth)
-    return dice.item()
+    dice = (2. * intersection + smooth) / (union + smooth)
+    return dice.mean()  # 取 batch 的平均
 
 def plot_sample(image, mask, pred_mask=None):
     """

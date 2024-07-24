@@ -17,7 +17,7 @@ def get_args():
     return parser.parse_args()
 
 def load_model(model_path, device):
-    model = UNet(n_channels=3, n_classes=1)  # 修改根據你的UNet定義
+    model = UNet(in_channels=3, out_channels=1)  # 修改根據你的UNet定義
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.to(device)
     model.eval()
@@ -27,8 +27,8 @@ def evaluate(model, dataloader, device):
     dice_scores = []
     with torch.no_grad():
         for batch in dataloader:
-            images = batch['image'].to(device)
-            masks = batch['mask'].to(device)
+            images = batch['image'].float().to(device)
+            masks = batch['mask'].float().to(device)
             outputs = model(images)
             preds = outputs > 0.5
             dice = dice_score(preds, masks)
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # 加載數據集
-    dataset = SimpleOxfordPetDataset(root=args.data_path, mode='valid')  # 假設valid模式加載驗證數據
+    dataset = SimpleOxfordPetDataset(root=args.data_path, mode='test')  # 假設valid模式加載驗證數據
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
     # 加載模型
