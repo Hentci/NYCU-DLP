@@ -7,6 +7,8 @@ from models.unet import UNet  # 假設你的UNet模型實現文件名為unet.py
 from models.resnet34_unet import Res34_UNet
 from oxford_pet import SimpleOxfordPetDataset  # 假設你的數據集實現文件名為oxford_pet.py
 from utils import dice_score, plot_sample  # 假設你的工具函數文件名為utils.py
+from torchvision import transforms
+from PIL import Image
 
 def get_args():
     parser = argparse.ArgumentParser(description='Evaluate the UNet model on validation dataset')
@@ -46,7 +48,11 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # 加載數據集
-    dataset = SimpleOxfordPetDataset(root=args.data_path, mode='test')  
+    dataset = SimpleOxfordPetDataset(root=args.data_path, mode='test', transform=transforms.Compose([
+        transforms.Lambda(lambda img: Image.fromarray(img)),  
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    ]))
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
     # 加載模型

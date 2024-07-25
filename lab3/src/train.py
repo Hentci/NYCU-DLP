@@ -9,27 +9,35 @@ from models.unet import UNet
 from models.resnet34_unet import Res34_UNet
 from oxford_pet import SimpleOxfordPetDataset
 from utils import dice_score
+from PIL import Image
 
 def train(args):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(device)
     
     # Data transformations
-    transform = transforms.Compose([
+    training_transform = transforms.Compose([
+        transforms.Lambda(lambda img: Image.fromarray(img)),  # Convert numpy array to PIL image
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(degrees=15),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
     ])
     
     # Load datasets
-    train_dataset = SimpleOxfordPetDataset(root=args.data_path, mode='train', transform=transform)
-    val_dataset = SimpleOxfordPetDataset(root=args.data_path, mode='valid', transform=transform)
+    train_dataset = SimpleOxfordPetDataset(root=args.data_path, mode='train', transform=training_transform)
+    val_dataset = SimpleOxfordPetDataset(root=args.data_path, mode='valid', transform=transforms.Compose([
+        transforms.Lambda(lambda img: Image.fromarray(img)),  # Convert numpy array to PIL image
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    ]))
     
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
     
     # Initialize model, loss function, and optimizer
     
-    'Choose model'
     if args.model_type == 'unet':
         model = UNet(in_channels=3, out_channels=1).to(device)
         save_path = '../saved_models/unet_best_model.pth'

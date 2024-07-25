@@ -1,1 +1,1 @@
-Mean Dice Score: 0.8138
+Mean Dice Score: 0.8418
