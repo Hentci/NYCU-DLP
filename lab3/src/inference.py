@@ -4,6 +4,7 @@ import os
 import numpy as np
 from torch.utils.data import DataLoader
 from models.unet import UNet  # 假設你的UNet模型實現文件名為unet.py
+from models.resnet34_unet import Res34_UNet
 from oxford_pet import SimpleOxfordPetDataset  # 假設你的數據集實現文件名為oxford_pet.py
 from utils import dice_score, plot_sample  # 假設你的工具函數文件名為utils.py
 from PIL import Image
@@ -14,11 +15,15 @@ def get_args():
     parser.add_argument('--data_path', type=str, help='path to the input data')
     parser.add_argument('--batch_size', '-b', type=int, default=1, help='batch size')
     parser.add_argument('--output_path', type=str, default='../inference_imgs', help='path to save the predicted masks')
+    parser.add_argument('--model_type', type=str, default='unet', help='unet or res34')
 
     return parser.parse_args()
 
-def load_model(model_path, device):
-    model = UNet(in_channels=3, out_channels=1)  # 修改根據你的UNet定義
+def load_model(model_path, device, type):
+    if type == 'unet':
+        model = UNet(in_channels=3, out_channels=1)  # 修改根據你的UNet定義
+    else:
+        model = Res34_UNet(in_channels=3, out_channels=1)
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.to(device)
     model.eval()
@@ -50,7 +55,7 @@ if __name__ == '__main__':
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
     # 加載模型
-    model = load_model(args.model, device)
+    model = load_model(args.model, device, type= args.model_type)
 
     # 進行推理
     predictions = predict(model, dataloader, device)

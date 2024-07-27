@@ -61,7 +61,7 @@ if __name__ == '__main__':
     # 進行評估
     mean_dice_score = evaluate(model, dataloader, device)
 
-    print(f"Mean Dice Score on validation dataset: {mean_dice_score:.4f}")
+    print(f"Mean Dice Score on test dataset: {mean_dice_score:.4f}")
 
     # 保存評估結果
     os.makedirs(args.output_path, exist_ok=True)
