@@ -87,3 +87,23 @@ def train_loss(train_losses, val_losses, save_path='loss_plot.png'):
     save_path (str): Path to save the plot
     """
     plot_loss(train_losses, val_losses, save_path)
+
+def plot_accuracy(train_accuracies, val_accuracies, save_path='accuracy_plot.png'):
+    """
+    Plot the training and validation accuracy (Dice Score).
+
+    Args:
+    train_accuracies (list of float): Training accuracies
+    val_accuracies (list of float): Validation accuracies
+    save_path (str): Path to save the plot
+    """
+    epochs = range(1, len(train_accuracies) + 1)
+    plt.figure(figsize=(10, 5))
+    plt.plot(epochs, train_accuracies, 'b', label='Training Dice Score')
+    plt.plot(epochs, val_accuracies, 'r', label='Validation Dice Score')
+    plt.title('Training and Validation Dice Score')
+    plt.xlabel('Epochs')
+    plt.ylabel('Dice Score')
+    plt.legend()
+    plt.savefig(save_path)
+    plt.close()
