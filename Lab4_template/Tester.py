@@ -44,7 +44,8 @@ class Dataset_Dance(torchData):
         self.img_folder = []
         self.label_folder = []
         
-        data_num = len(glob('./Demo_Test/*'))
+        data_num = len(glob(os.path.join(root, 'test', 'test_img', '*')))
+
         for i in range(data_num):
             self.img_folder.append(sorted(glob(os.path.join(root , f'test/test_img/{i}/*')), key=get_key))
             self.label_folder.append(sorted(glob(os.path.join(root , f'test/test_label/{i}/*')), key=get_key))
@@ -123,25 +124,23 @@ class Test_model(VAE_Model):
         label_list = []
 
         # TODO
-        # Initial frame to start generation
-        current_frame = img[0]
-        
-        for i in range(1, label.shape[0]):
-            current_label = label[i]
-            frame_feature = self.frame_transformation(current_frame)
+        for t in range(1, label.shape[0]):
+            current_img = img[0] if t == 1 else decoded_frame_list[-1]
+            current_label = label[t]
+            
+            # Forward pass
+            frame_feature = self.frame_transformation(current_img)
             label_feature = self.label_transformation(current_label)
             
-            mu, logvar = self.Gaussian_Predictor(frame_feature, label_feature)
-            z = self.Gaussian_Predictor.reparameterize(mu, logvar)
+            # Conduct Posterior prediction in Encoder
+            z, mu, logvar = self.Gaussian_Predictor(frame_feature, label_feature)
             
-            decoder_input = torch.cat([frame_feature, label_feature, z], dim=1)
-            decoder_feature = self.Decoder_Fusion(decoder_input)
-            generated_frame = self.Generator(decoder_feature)
+            # Decoder fusion and generative model
+            decoder_feature = self.Decoder_Fusion(frame_feature, label_feature, z)
+            output = self.Generator(decoder_feature)
             
-            decoded_frame_list.append(generated_frame.cpu())
+            decoded_frame_list.append(output.cpu())
             label_list.append(current_label.cpu())
-            
-            current_frame = generated_frame
             
         
         # Please do not modify this part, it is used for visulization

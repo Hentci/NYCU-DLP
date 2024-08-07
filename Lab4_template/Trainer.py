@@ -49,8 +49,13 @@ class kl_annealing():
         return self.beta
 
     def frange_cycle_linear(self, n_iter, start=0.0, stop=1.0,  n_cycle=1, ratio=1):
+        # prevent divide by zero
+        if n_iter == 0 or ratio == 0:
+            return start
+        
         L = np.ones(n_iter)
         period = n_iter/n_cycle
+        # print(stop, start, n_iter, n_cycle, period, ratio)
         step = (stop-start)/(period*ratio) # linear schedule
 
         for c in range(n_cycle):
@@ -135,51 +140,69 @@ class VAE_Model(nn.Module):
     def training_one_step(self, img, label, adapt_TeacherForcing):
         self.optim.zero_grad()
         
-        # Forward pass
-        frame_feature = self.frame_transformation(img)
-        label_feature = self.label_transformation(label)
+        total_loss = 0
+
+        # Process each frame in the sequence separately
+        for t in range(img.size(1)):  # Iterate over the sequence length
+            current_img = img[:, t, :, :, :]
+            current_label = label[:, t, :, :, :]
+            
+            # Forward pass
+            frame_feature = self.frame_transformation(current_img)
+            label_feature = self.label_transformation(current_label)
+            
+            # Conduct Posterior prediction in Encoder
+            z, mu, logvar = self.Gaussian_Predictor(frame_feature, label_feature)
+            
+            # Decoder fusion and generative model
+            decoder_feature = self.Decoder_Fusion(frame_feature, label_feature, z)
+            output = self.Generator(decoder_feature)
+            
+            # Compute losses
+            recon_loss = self.mse_criterion(output, current_img)
+            kl_loss = kl_criterion(mu, logvar, self.batch_size)
+            loss = recon_loss + self.kl_annealing.get_beta() * kl_loss
+            
+            total_loss += loss
         
-        # Conduct Posterior prediction in Encoder
-        mu, logvar = self.Gaussian_Predictor(frame_feature, label_feature)
-        z = self.Gaussian_Predictor.reparameterize(mu, logvar)
-        
-        # Decoder fusion and generative model
-        decoder_input = torch.cat([frame_feature, label_feature, z], dim=1)
-        decoder_feature = self.Decoder_Fusion(decoder_input)
-        output = self.Generator(decoder_feature)
-        
-        # Compute losses
-        recon_loss = self.mse_criterion(output, img)
-        kl_loss = kl_criterion(mu, logvar, self.batch_size)
-        loss = recon_loss + self.kl_annealing.get_beta() * kl_loss
+        total_loss /= img.size(1)  # Average the loss over the sequence length
         
         # Backward pass and optimization
-        loss.backward()
+        total_loss.backward()
         self.optimizer_step()
         
-        return loss
+        return total_loss
     
 
     def val_one_step(self, img, label):
-        # Forward pass
-        frame_feature = self.frame_transformation(img)
-        label_feature = self.label_transformation(label)
+        total_loss = 0
+
+        # Process each frame in the sequence separately
+        for t in range(img.size(1)):  # Iterate over the sequence length
+            current_img = img[:, t, :, :, :]
+            current_label = label[:, t, :, :, :]
+            
+            # Forward pass
+            frame_feature = self.frame_transformation(current_img)
+            label_feature = self.label_transformation(current_label)
+            
+            # Conduct Posterior prediction in Encoder
+            z, mu, logvar = self.Gaussian_Predictor(frame_feature, label_feature)
+            
+            # Decoder fusion and generative model
+            decoder_feature = self.Decoder_Fusion(frame_feature, label_feature, z)
+            output = self.Generator(decoder_feature)
+            
+            # Compute losses
+            recon_loss = self.mse_criterion(output, current_img)
+            kl_loss = kl_criterion(mu, logvar, self.batch_size)
+            loss = recon_loss + self.kl_annealing.get_beta() * kl_loss
+            
+            total_loss += loss
         
-        # Conduct Posterior prediction in Encoder
-        mu, logvar = self.Gaussian_Predictor(frame_feature, label_feature)
-        z = self.Gaussian_Predictor.reparameterize(mu, logvar)
+        total_loss /= img.size(1)  # Average the loss over the sequence length
         
-        # Decoder fusion and generative model
-        decoder_input = torch.cat([frame_feature, label_feature, z], dim=1)
-        decoder_feature = self.Decoder_Fusion(decoder_input)
-        output = self.Generator(decoder_feature)
-        
-        # Compute losses
-        recon_loss = self.mse_criterion(output, img)
-        kl_loss = kl_criterion(mu, logvar, self.batch_size)
-        loss = recon_loss + self.kl_annealing.get_beta() * kl_loss
-        
-        return loss
+        return total_loss
                 
     def make_gif(self, images_list, img_name):
         new_list = []
