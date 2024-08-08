@@ -120,7 +120,7 @@ class Test_model(VAE_Model):
         # decoded_frame_list is used to store the predicted frame seq
         # label_list is used to store the label seq
         # Both list will be used to make gif
-        decoded_frame_list = [img[0].cpu()]
+        decoded_frame_list = [img[0]]
         label_list = []
 
         # TODO
@@ -136,11 +136,12 @@ class Test_model(VAE_Model):
             z, mu, logvar = self.Gaussian_Predictor(frame_feature, label_feature)
             
             # Decoder fusion and generative model
-            decoder_feature = self.Decoder_Fusion(frame_feature, label_feature, z)
+            decoder_feature = self.Decoder_Fusion(frame_feature, label_feature, torch.randn_like(z))
             output = self.Generator(decoder_feature)
+            output = torch.nn.functional.sigmoid(output)
             
-            decoded_frame_list.append(output.cpu())
-            label_list.append(current_label.cpu())
+            decoded_frame_list.append(output)
+            label_list.append(current_label)
             
         
         # Please do not modify this part, it is used for visulization
