@@ -53,27 +53,27 @@ def kl_criterion(mu, logvar, batch_size):
 class kl_annealing():
     def __init__(self, args, current_epoch=0):
         self.current_epoch = current_epoch
-        self.beta = self.frange_cycle_linear(args.num_epoch, n_cycle=args.kl_anneal_cycle, ratio=args.kl_anneal_ratio)
-        print(self.beta)
-        
+        self.beta_schedule = self._compute_beta_schedule(args.num_epoch, args.kl_anneal_cycle, args.kl_anneal_ratio)
+        # print(self.beta_schedule)
+
     def update(self):
         self.current_epoch += 1
     
     def get_beta(self):
-        return self.beta[self.current_epoch]
+        return self.beta_schedule[self.current_epoch]
 
-    def frange_cycle_linear(self, n_iter, start=0.0, stop=1.0,  n_cycle=1, ratio=1):
-        beta = np.ones(n_iter)
-        period = n_iter / n_cycle
-        step = (stop-start)/(period*ratio)
+    def _compute_beta_schedule(self, num_epochs, n_cycle=1, ratio=1, start=0.0, stop=1.0):
+        beta = np.ones(num_epochs)
+        period = num_epochs / n_cycle
+        step = (stop - start) / (period * ratio)
 
         for c in range(n_cycle):
             v, i = start, 0
-            while v <= stop and (int(i+c*period) < n_iter):
-                beta[int(i+c*period)] = v
+            while v <= stop and int(i + c * period) < num_epochs:
+                beta[int(i + c * period)] = v
                 v += step
                 i += 1
-        return beta        
+        return beta   
 
 class VAE_Model(nn.Module):
     def __init__(self, args):
