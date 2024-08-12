@@ -74,6 +74,7 @@ class kl_annealing():
                 v += step
                 i += 1
         return beta   
+    
 
 class VAE_Model(nn.Module):
     def __init__(self, args):
@@ -367,6 +368,18 @@ class VAE_Model(nn.Module):
         if self.current_epoch >= self.tfr_sde:
             self.tfr -= self.tfr_d_step
             self.tfr = max(0, self.tfr)
+    
+    # new update method
+    # def teacher_forcing_ratio_update(self):
+    #     if self.current_epoch < 30:
+    #         # 在第 30 epoch 之前，tfr 保持為 0
+    #         self.tfr = 0
+    #     elif self.current_epoch >= self.tfr_sde:
+    #         # 從第 30 epoch 開始，tfr 從 1 開始衰減
+    #         if self.tfr == 0:  # 如果 tfr 還是 0，將它設置為 1
+    #             self.tfr = 1
+    #         self.tfr -= self.tfr_d_step
+    #         self.tfr = max(0, self.tfr)
 
             
     def tqdm_bar(self, mode, pbar, loss, lr):

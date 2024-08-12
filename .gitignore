@@ -3,3 +3,5 @@
 *saved_models*
 *inference_imgs*
 *.pth*
+*_test*
+*log*
