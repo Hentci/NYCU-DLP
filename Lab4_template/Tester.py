@@ -15,6 +15,7 @@ from math import log10
 from Trainer import VAE_Model
 import glob
 import pandas as pd
+import random
 
 
 TA_ = """
@@ -36,7 +37,14 @@ from glob import glob
 from torch.utils.data import Dataset as torchData
 from torchvision.datasets.folder import default_loader as imgloader
 
-
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
 
 class Dataset_Dance(torchData):
     def __init__(self, root, transform, mode='test', video_len=7, partial=1.0):
@@ -187,6 +195,10 @@ class Test_model(VAE_Model):
 
 
 def main(args):
+
+    # set seed
+    set_seed(777)    
+
     os.makedirs(args.save_root, exist_ok=True)
     model = Test_model(args).to(args.device)
     model.load_checkpoint()
