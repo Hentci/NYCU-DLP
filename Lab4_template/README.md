@@ -1,0 +1,1 @@
+`val_PSNR.py`參數的輸入和`Tester.py`的設定一樣，輸出則是會根據 validation dataset 產出 PSNR-per frame diagram。
