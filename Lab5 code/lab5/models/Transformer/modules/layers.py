@@ -2,20 +2,46 @@ import torch.nn as nn
 import torch
 import math
 
-#TODO1
 class MultiHeadAttention(nn.Module):
     def __init__(self, dim=768, num_heads=16, attn_drop=0.1):
         super(MultiHeadAttention, self).__init__()
+        self.num_heads = num_heads
+        self.dim = dim
+        self.d_k = dim // num_heads
+        self.d_v = dim // num_heads
+
+        # Query, Key, Value linear layers
+        self.query = nn.Linear(dim, dim)
+        self.key = nn.Linear(dim, dim)
+        self.value = nn.Linear(dim, dim)
+
+        # Dropout layer
+        self.attn_drop = nn.Dropout(attn_drop)
+        self.proj = nn.Linear(dim, dim)
+        self.proj_drop = nn.Dropout(attn_drop)
 
     def forward(self, x):
-        ''' Hint: input x tensor shape is (batch_size, num_image_tokens, dim), 
-            because the bidirectional transformer first will embed each token to dim dimension, 
-            and then pass to n_layers of encoders consist of Multi-Head Attention and MLP. 
-            # of head set 16
-            Total d_k , d_v set to 768
-            d_k , d_v for one head will be 768//16.
-        '''
-        raise Exception('TODO1!')
+        batch_size, num_tokens, dim = x.size()
+
+        # Ensure the input dimension is correct
+        assert dim == self.dim, "Input dimension must match model dimension"
+
+        # Linear projections for query, key, value
+        q = self.query(x).view(batch_size, num_tokens, self.num_heads, self.d_k).transpose(1, 2)
+        k = self.key(x).view(batch_size, num_tokens, self.num_heads, self.d_k).transpose(1, 2)
+        v = self.value(x).view(batch_size, num_tokens, self.num_heads, self.d_v).transpose(1, 2)
+
+        # Scaled Dot-Product Attention
+        attn_scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.d_k)
+        attn_probs = torch.softmax(attn_scores, dim=-1)
+        attn_probs = self.attn_drop(attn_probs)
+
+        # Weighted sum of values
+        context = torch.matmul(attn_probs, v).transpose(1, 2).contiguous().view(batch_size, num_tokens, dim)
+        output = self.proj(context)
+        output = self.proj_drop(output)
+
+        return output
 
 class MLP(nn.Sequential):
     def __init__(self, dim=768, hidden_dim=3072, drop_rate=0.1):
@@ -61,4 +87,3 @@ class Encoder(nn.Module):
         mlp = self.MLP(x)
         x = x + mlp
         return self.LayerNorm2(x)
-    
