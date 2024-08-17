@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
     # you can modify the hyperparameters 
     parser.add_argument('--epochs', type=int, default=50, help='Number of epochs to train.')
-    parser.add_argument('--save-per-epoch', type=int, default=1, help='Save CKPT per ** epochs(default: 1)')
+    parser.add_argument('--save-per-epoch', type=int, default=10, help='Save CKPT per ** epochs(default: 1)')
     parser.add_argument('--start-from-epoch', type=int, default=0, help='Starting epoch number.')
     parser.add_argument('--ckpt-interval', type=int, default=0, help='Checkpoint interval.')
     parser.add_argument('--learning-rate', type=float, default=1e-4, help='Learning rate.')
@@ -124,16 +124,21 @@ if __name__ == '__main__':
         train_transformer.scheduler.step()
 
         # Clear the cache after each epoch to avoid memory overflow
-        torch.cuda.empty_cache()
+        # torch.cuda.empty_cache()
 
+        # if epoch % args.save_per_epoch == 0:
+        #     checkpoint_path = os.path.join("transformer_checkpoints", f"epoch_{epoch}.pt")
+        #     torch.save({
+        #         'epoch': epoch,
+        #         'model_state_dict': train_transformer.model.state_dict(),
+        #         'optimizer_state_dict': train_transformer.optim.state_dict(),
+        #         'scheduler_state_dict': train_transformer.scheduler.state_dict(),
+        #         'train_loss': train_loss,
+        #         'val_loss': val_loss
+        #     }, checkpoint_path)
+        #     print(f"Checkpoint saved at {checkpoint_path}")
+        
         if epoch % args.save_per_epoch == 0:
-            checkpoint_path = os.path.join("transformer_checkpoints", f"epoch_{epoch}.pt")
-            torch.save({
-                'epoch': epoch,
-                'model_state_dict': train_transformer.model.state_dict(),
-                'optimizer_state_dict': train_transformer.optim.state_dict(),
-                'scheduler_state_dict': train_transformer.scheduler.state_dict(),
-                'train_loss': train_loss,
-                'val_loss': val_loss
-            }, checkpoint_path)
-            print(f"Checkpoint saved at {checkpoint_path}")
+            transformer_checkpoint_path = os.path.join("transformer_checkpoints", f"epoch_{epoch}.pt")
+            torch.save(train_transformer.model.transformer.state_dict(), transformer_checkpoint_path)
+            print(f"Transformer weights saved at {transformer_checkpoint_path}")

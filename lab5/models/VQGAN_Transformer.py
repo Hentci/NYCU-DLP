@@ -23,6 +23,7 @@ class MaskGit(nn.Module):
 
     def load_transformer_checkpoint(self, load_ckpt_path):
         self.transformer.load_state_dict(torch.load(load_ckpt_path))
+    
 
     @staticmethod
     def load_vqgan(configs):
