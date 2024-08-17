@@ -17,7 +17,7 @@ from torch.utils.checkpoint import checkpoint
 class TrainTransformer:
     def __init__(self, args, MaskGit_CONFIGS):
         self.args = args
-        self.model = VQGANTransformer(MaskGit_CONFIGS["model_param"]).to(device=args.device)
+        self.model = VQGANTransformer(MaskGit_CONFIGS["model_param"], batch_size=args.batch_size).to(device=args.device)
         self.optim, self.scheduler = self.configure_optimizers()
         self.prepare_training()
         # self.scaler = GradScaler()
@@ -38,6 +38,7 @@ class TrainTransformer:
         for batch_idx, data in enumerate(tqdm(train_loader, ncols=140)):
             images = data.to(device=self.args.device)
             logits, z_indices = self.model(images)
+            # print('================')
 
             # 計算 cross-entropy loss
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), z_indices.view(-1))
@@ -51,6 +52,7 @@ class TrainTransformer:
                 self.optim.zero_grad()
 
             running_loss += loss.item() * self.args.accum_grad
+            
 
         epoch_loss = running_loss / len(train_loader.dataset)
         print(f"Train Epoch: {epoch} Loss: {epoch_loss:.6f}")
@@ -81,7 +83,7 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint-path', type=str, default='./checkpoints/last_ckpt.pt', help='Path to checkpoint.')
     parser.add_argument('--device', type=str, default="cuda:1", help='Which device the training is on.')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of worker')
-    parser.add_argument('--batch-size', type=int, default=1, help='Batch size for training.')
+    parser.add_argument('--batch-size', type=int, default=32, help='Batch size for training.')
     parser.add_argument('--partial', type=float, default=1.0, help='Partial data used for training (default: 1.0)')    
     parser.add_argument('--accum-grad', type=int, default=10, help='Number for gradient accumulation.')
 

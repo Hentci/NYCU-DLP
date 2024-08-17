@@ -10,7 +10,7 @@ from .Transformer import BidirectionalTransformer
 
 #TODO2 step1: design the MaskGIT model
 class MaskGit(nn.Module):
-    def __init__(self, configs):
+    def __init__(self, configs, batch_size):
         super().__init__()
         self.vqgan = self.load_vqgan(configs['VQ_Configs'])
     
@@ -19,6 +19,7 @@ class MaskGit(nn.Module):
         self.choice_temperature = configs['choice_temperature']
         self.gamma = self.gamma_func(configs['gamma_type'])
         self.transformer = BidirectionalTransformer(configs['Transformer_param'])
+        self.batch_size = batch_size  # 保存 batch_size
 
     def load_transformer_checkpoint(self, load_ckpt_path):
         self.transformer.load_state_dict(torch.load(load_ckpt_path))
@@ -74,14 +75,14 @@ class MaskGit(nn.Module):
         # Ground truth: encode the input image to z_indices
         z, z_indices = self.encode_to_z(x)
         
-        # 检查 z_indices 的形状
-        print(f"z_indices shape: {z_indices.shape}")
-        
         # 重塑 z_indices 为 (batch_size, num_image_tokens)
-        z_indices = z_indices.view(z_indices.size(0), -1)
-        
+        z_indices = z_indices.view(self.batch_size, -1)
+
         # Get logits from the transformer
         logits = self.transformer(z_indices)
+
+        # print(f"logits shape: {logits.shape}")
+        # print(f"z_indices shape: {z_indices.shape}")
         
         return logits, z_indices
     

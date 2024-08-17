@@ -21,7 +21,9 @@ class MultiHeadAttention(nn.Module):
         self.proj_drop = nn.Dropout(attn_drop)
 
     def forward(self, x):
+        # print(x.size())
         batch_size, num_tokens, dim = x.size()
+        # print(batch_size, num_tokens, dim)
 
         # Ensure the input dimension is correct
         assert dim == self.dim, "Input dimension must match model dimension"
