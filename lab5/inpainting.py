@@ -33,77 +33,59 @@ class MaskGIT:
 
     ##TODO3 step1-1: total iteration decoding  
     #mask_b: iteration decoding initial mask, where mask_b is true means mask
-    def inpainting(self, image, mask_b, i):  # MakGIT inference
-        maska = torch.zeros(self.total_iter, 3, 16, 16)  # save all iterations of masks in latent domain
-        imga = torch.zeros(self.total_iter + 1, 3, 64, 64)  # save all iterations of decoded images
-        mean = torch.tensor([0.4868, 0.4341, 0.3844], device=self.device).view(3, 1, 1)
+    def inpainting(self, image, mask_b, i): #MakGIT inference
+        maska = torch.zeros(self.total_iter, 3, 16, 16) #save all iterations of masks in latent domain
+        imga = torch.zeros(self.total_iter+1, 3, 64, 64)#save all iterations of decoded images
+        mean = torch.tensor([0.4868, 0.4341, 0.3844], device=self.device).view(3, 1, 1)  
         std = torch.tensor([0.2620, 0.2527, 0.2543], device=self.device).view(3, 1, 1)
         ori = (image[0] * std) + mean
-        imga[0] = ori  # mask the first image to be the ground truth of masked image
-
-        dec_img_ori = ori  # 初始化 dec_img_ori 以防止未赋值错误
+        imga[0] = ori #mask the first image to be the ground truth of masked image
 
         self.model.eval()
         with torch.no_grad():
-            z, z_indices = self.model.encode_to_z(image)  # z_indices: masked tokens (b,16*16)
-            mask_num = mask_b.sum()  # total number of mask tokens 
-            z_indices_predict = z_indices.clone()
-            mask_bc = mask_b.clone()
-            mask_b = mask_b.to(device=self.device)
-            mask_bc = mask_bc.to(device=self.device)
-            
+            z, z_indices = self.model.encode_to_z(image)  #z_indices: masked tokens (b,16*16)
+            mask_num = mask_b.sum()  #total number of mask token 
+            z_indices_predict=z_indices
+            mask_bc=mask_b
+            mask_b=mask_b.to(device=self.device)
+            mask_bc=mask_bc.to(device=self.device)
+
+            ratio = 0
             # Iterative decoding loop
             for step in range(self.total_iter):
-                if step == self.sweet_spot:
-                    break
+                # if step == self.sweet_spot:
+                #     break
 
-                # Calculate n based on the current ratio
-                n = int(self.model.gamma(step / self.total_iter) * mask_num)
-                # print(n)
-
-                # Masked tokens are replaced by a special mask token
-                masked_z_indices = z_indices_predict.clone()
-                # print(masked_z_indices.shape, mask_bc.shape)
-                # print(self.model.mask_token_id)
-                tmp_mask_bc = mask_bc
-                if masked_z_indices.shape == torch.Size([256]):
-                    tmp_mask_bc = tmp_mask_bc.squeeze(0)
+                ratio = self.model.gamma((step+1)/self.total_iter)
+                
+                # Prepare the masked indices
+                # masked_z_indices = z_indices_predict.clone()
+                
+                # tmp_mask_bc = mask_bc
+                # if masked_z_indices.shape == torch.Size([256]):
+                #     tmp_mask_bc = tmp_mask_bc.squeeze(0)
                     
-                masked_z_indices[tmp_mask_bc] = self.model.mask_token_id
+                # masked_z_indices[tmp_mask_bc] = self.model.mask_token_id
                 
-                # 重塑 z_indices 为 (batch_size, num_image_tokens)
-                masked_z_indices = masked_z_indices.view(self.batch_size, -1)
+                # # 重塑 z_indices 为 (batch_size, num_image_tokens)
+                # masked_z_indices = masked_z_indices.view(self.batch_size, -1)
+                
+                z_indices_predict = z_indices_predict.view(self.batch_size, -1)
+                # print(z_indices_predict.size())
 
-                # Get logits from the transformer
-                logits = self.model.transformer(masked_z_indices)
+                # Perform the iteration of inpainting
+                z_indices_predict, mask_bc = self.model.inpainting(z_indices_predict, mask_bc, step, self.total_iter, mask_num)
                 
-                # Apply softmax to convert logits into probabilities
-                probs = torch.softmax(logits, dim=-1)
                 
-                # print(probs)
-                
-                # Find the maximum probability and the corresponding token predictions
-                z_indices_predict_prob, z_indices_predict = torch.max(probs, dim=-1)
-                
-                # Calculate confidence with Gumbel noise
-                # gumbel_noise = -torch.log(-torch.log(torch.rand_like(probs)))
-                # confidence = z_indices_predict_prob + self.model.choice_temperature * gumbel_noise
-                
-                # Sort tokens by confidence
-                _, sorted_indices = torch.sort(z_indices_predict_prob, dim=-1, descending=True)
-                
-                # print(sorted_indices)
-                
-                # Update mask based on the gamma function and sorted confidence
-                unmask_indices = sorted_indices[:, :n]
-                mask_bc.scatter_(1, unmask_indices, False)
-                print(step, mask_bc)
+                # 在每個步驟後進行檢查
+                # print(f"Step {step}: unmasked tokens: {mask_bc.sum().item()}")
+                print(f"Step {step}: z_indices_predict: {z_indices_predict}")
 
                 # Visualize the current mask
                 mask_i = mask_bc.view(1, 16, 16)
                 mask_image = torch.ones(3, 16, 16)
-                indices = torch.nonzero(mask_i, as_tuple=False)
-                mask_image[:, indices[:, 1], indices[:, 2]] = 0
+                indices = torch.nonzero(mask_i, as_tuple=False)  # label mask true
+                mask_image[:, indices[:, 1], indices[:, 2]] = 0  #3,16,16
                 maska[step] = mask_image
 
                 # Decode the image from latent space
@@ -112,13 +94,12 @@ class MaskGIT:
                 z_q = z_q.permute(0, 3, 1, 2)
                 decoded_img = self.model.vqgan.decode(z_q)
                 dec_img_ori = (decoded_img[0] * std) + mean
-                imga[step + 1] = dec_img_ori  # save decoded image
+                imga[step + 1] = dec_img_ori # save decoded image
 
-        # Save the decoded image and mask scheduling results
-        vutils.save_image(dec_img_ori, os.path.join("test_results", f"image_{i:03d}.png"), nrow=1)
-        
-        vutils.save_image(maska, os.path.join("mask_scheduling", f"test_{i}.png"), nrow=10)
-        vutils.save_image(imga, os.path.join("imga", f"test_{i}.png"), nrow=7)
+            # Save the decoded image and mask scheduling results
+            vutils.save_image(dec_img_ori, os.path.join("test_results", f"image_{i:03d}.png"), nrow=1) 
+            vutils.save_image(maska, os.path.join("mask_scheduling", f"test_{i}.png"), nrow=10) 
+            vutils.save_image(imga, os.path.join("imga", f"test_{i}.png"), nrow=7)
 
 
 
@@ -162,14 +143,14 @@ if __name__ == '__main__':
     
     
 #TODO3 step1-2: modify the path, MVTM parameters
-    parser.add_argument('--load-transformer-ckpt-path', type=str, default='/home/hentci/code/NYCU-DLP/lab5/transformer_checkpoints/epoch_30.pt', help='load ckpt')
+    parser.add_argument('--load-transformer-ckpt-path', type=str, default='/home/hentci/code/NYCU-DLP/lab5/transformer_checkpoints/epoch_10.pt', help='load ckpt')
     
     #dataset path
     parser.add_argument('--test-maskedimage-path', type=str, default='/home/hentci/code/lab5_dataset/masked_image', help='Path to testing image dataset.')
     parser.add_argument('--test-mask-path', type=str, default='/home/hentci/code/lab5_dataset/mask64', help='Path to testing mask dataset.')
     #MVTM parameter
-    parser.add_argument('--sweet-spot', type=int, default=3, help='sweet spot: the best step in total iteration')
-    parser.add_argument('--total-iter', type=int, default=5, help='total step for mask scheduling')
+    parser.add_argument('--sweet-spot', type=int, default=10, help='sweet spot: the best step in total iteration')
+    parser.add_argument('--total-iter', type=int, default=20, help='total step for mask scheduling')
     parser.add_argument('--mask-func', type=str, default='cosine', help='mask scheduling function')
 
     args = parser.parse_args()

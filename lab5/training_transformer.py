@@ -46,6 +46,7 @@ class TrainTransformer:
             # 梯度累積
             loss = loss / self.args.accum_grad
             loss.backward()
+            
 
             if (batch_idx + 1) % self.args.accum_grad == 0:
                 self.optim.step()
@@ -88,7 +89,7 @@ if __name__ == '__main__':
     parser.add_argument('--accum-grad', type=int, default=10, help='Number for gradient accumulation.')
 
     # you can modify the hyperparameters 
-    parser.add_argument('--epochs', type=int, default=50, help='Number of epochs to train.')
+    parser.add_argument('--epochs', type=int, default=30, help='Number of epochs to train.')
     parser.add_argument('--save-per-epoch', type=int, default=10, help='Save CKPT per ** epochs(default: 1)')
     parser.add_argument('--start-from-epoch', type=int, default=0, help='Starting epoch number.')
     parser.add_argument('--ckpt-interval', type=int, default=0, help='Checkpoint interval.')
