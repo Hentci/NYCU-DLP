@@ -50,13 +50,10 @@ class MaskGIT:
             mask_b=mask_b.to(device=self.device)
             mask_bc=mask_bc.to(device=self.device)
 
-            ratio = 0
             # Iterative decoding loop
             for step in range(self.total_iter):
-                # if step == self.sweet_spot:
-                #     break
-
-                ratio = self.model.gamma((step+1)/self.total_iter)
+                if step == self.sweet_spot:
+                    break
                 
                 # Prepare the masked indices
                 # masked_z_indices = z_indices_predict.clone()
@@ -74,12 +71,12 @@ class MaskGIT:
                 # print(z_indices_predict.size())
 
                 # Perform the iteration of inpainting
-                z_indices_predict, mask_bc = self.model.inpainting(z_indices_predict, mask_bc, step, self.total_iter, mask_num)
+                z_indices_predict, mask_bc = self.model.inpainting(z_indices_predict, mask_bc, step, self.total_iter, mask_num, self.mask_func)
                 
                 
                 # 在每個步驟後進行檢查
                 # print(f"Step {step}: unmasked tokens: {mask_bc.sum().item()}")
-                print(f"Step {step}: z_indices_predict: {z_indices_predict}")
+                # print(f"Step {step}: z_indices_predict: {z_indices_predict}")
 
                 # Visualize the current mask
                 mask_i = mask_bc.view(1, 16, 16)
@@ -143,13 +140,13 @@ if __name__ == '__main__':
     
     
 #TODO3 step1-2: modify the path, MVTM parameters
-    parser.add_argument('--load-transformer-ckpt-path', type=str, default='/home/hentci/code/NYCU-DLP/lab5/transformer_checkpoints/epoch_10.pt', help='load ckpt')
+    parser.add_argument('--load-transformer-ckpt-path', type=str, default='/home/hentci/code/NYCU-DLP/lab5/transformer_checkpoints_2/epoch_30.pt', help='load ckpt')
     
     #dataset path
     parser.add_argument('--test-maskedimage-path', type=str, default='/home/hentci/code/lab5_dataset/masked_image', help='Path to testing image dataset.')
     parser.add_argument('--test-mask-path', type=str, default='/home/hentci/code/lab5_dataset/mask64', help='Path to testing mask dataset.')
     #MVTM parameter
-    parser.add_argument('--sweet-spot', type=int, default=10, help='sweet spot: the best step in total iteration')
+    parser.add_argument('--sweet-spot', type=int, default=2, help='sweet spot: the best step in total iteration')
     parser.add_argument('--total-iter', type=int, default=20, help='total step for mask scheduling')
     parser.add_argument('--mask-func', type=str, default='cosine', help='mask scheduling function')
 

@@ -85,6 +85,7 @@ class MaskGit(nn.Module):
         mask.scatter_(dim=1, index=sample, value=True)
 
         masked_indices = self.mask_token_id * torch.ones_like(z_indices, device=z_indices.device)
+        # 加上隨機生成的 mask
         a_indices = mask * z_indices + (~mask) * masked_indices
         
         # Get logits from the transformer
@@ -97,7 +98,7 @@ class MaskGit(nn.Module):
     
     ##TODO3 step1-1: define one iteration decoding   
     @torch.no_grad()
-    def inpainting(self, masked_z_indices, mask_bc, step, total_iter, mask_num):
+    def inpainting(self, masked_z_indices, mask_bc, step, total_iter, mask_num, gamma_type):
         
         masked_z_indices[mask_bc] = 1024
         
@@ -112,7 +113,9 @@ class MaskGit(nn.Module):
         z_indices_predict_prob, z_indices_predict = torch.max(probs, dim=-1)
         z_indices_predict_prob[~mask_bc] = float('inf')
         # Step 4: Calculate the current ratio
-        ratio = self.gamma((step + 1) / total_iter)
+        # ratio = self.gamma((step + 1) / total_iter)
+        ratio_func = self.gamma_func(mode=gamma_type)
+        ratio = ratio_func((step + 1) / total_iter)
 
         # Step 5: Add temperature annealing gumbel noise as confidence
         gumbel_noise = -torch.log(-torch.log(torch.rand_like(z_indices_predict_prob)))

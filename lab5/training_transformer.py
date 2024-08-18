@@ -12,6 +12,7 @@ import yaml
 from torch.utils.data import DataLoader
 import torch.cuda.amp as amp
 from torch.utils.checkpoint import checkpoint
+import matplotlib.pyplot as plt  # 新增這一行
 
 # TODO2 step1-4: design the transformer training strategy
 class TrainTransformer:
@@ -22,6 +23,8 @@ class TrainTransformer:
         self.prepare_training()
         # self.scaler = GradScaler()
         self.start_epoch = args.start_from_epoch  # Initialize start_epoch from args
+        self.train_losses = []  # 用來儲存每個 epoch 的訓練損失
+        self.val_losses = []  # 用來儲存每個 epoch 的驗證損失
 
     @staticmethod
     def prepare_training():
@@ -46,14 +49,12 @@ class TrainTransformer:
             # 梯度累積
             loss = loss / self.args.accum_grad
             loss.backward()
-            
 
             if (batch_idx + 1) % self.args.accum_grad == 0:
                 self.optim.step()
                 self.optim.zero_grad()
 
             running_loss += loss.item() * self.args.accum_grad
-            
 
         epoch_loss = running_loss / len(train_loader.dataset)
         print(f"Train Epoch: {epoch} Loss: {epoch_loss:.6f}")
@@ -76,21 +77,33 @@ class TrainTransformer:
         print(f"Val Epoch: {epoch} Loss: {epoch_loss:.6f}")
         return epoch_loss
 
+    def save_loss_curve(self):
+        plt.figure()
+        plt.plot(self.train_losses, label='Train Loss')
+        plt.plot(self.val_losses, label='Val Loss')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Training and Validation Loss Curves')
+        plt.legend()
+        plt.savefig('loss_curve.png')
+        plt.show()
+        print("Loss curve saved as 'loss_curve.png'")
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="MaskGIT")
     # TODO2:check your dataset path is correct 
     parser.add_argument('--train_d_path', type=str, default="./cat_face/train/", help='Training Dataset Path')
     parser.add_argument('--val_d_path', type=str, default="./cat_face/val/", help='Validation Dataset Path')
     parser.add_argument('--checkpoint-path', type=str, default='./checkpoints/last_ckpt.pt', help='Path to checkpoint.')
-    parser.add_argument('--device', type=str, default="cuda:1", help='Which device the training is on.')
+    parser.add_argument('--device', type=str, default="cuda:0", help='Which device the training is on.')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of worker')
-    parser.add_argument('--batch-size', type=int, default=32, help='Batch size for training.')
+    parser.add_argument('--batch-size', type=int, default=8, help='Batch size for training.')
     parser.add_argument('--partial', type=float, default=1.0, help='Partial data used for training (default: 1.0)')    
     parser.add_argument('--accum-grad', type=int, default=10, help='Number for gradient accumulation.')
 
     # you can modify the hyperparameters 
-    parser.add_argument('--epochs', type=int, default=30, help='Number of epochs to train.')
-    parser.add_argument('--save-per-epoch', type=int, default=10, help='Save CKPT per ** epochs(default: 1)')
+    parser.add_argument('--epochs', type=int, default=50, help='Number of epochs to train.')
+    parser.add_argument('--save-per-epoch', type=int, default=5, help='Save CKPT per ** epochs(default: 1)')
     parser.add_argument('--start-from-epoch', type=int, default=0, help='Starting epoch number.')
     parser.add_argument('--ckpt-interval', type=int, default=0, help='Checkpoint interval.')
     parser.add_argument('--learning-rate', type=float, default=1e-4, help='Learning rate.')
@@ -121,25 +134,20 @@ if __name__ == '__main__':
     for epoch in range(train_transformer.start_epoch + 1, args.epochs + 1):
         train_loss = train_transformer.train_one_epoch(train_loader, epoch)
         val_loss = train_transformer.eval_one_epoch(val_loader, epoch)
+
+        # 將損失添加到列表中
+        train_transformer.train_losses.append(train_loss)
+        train_transformer.val_losses.append(val_loss)
         
         train_transformer.scheduler.step()
 
         # Clear the cache after each epoch to avoid memory overflow
         # torch.cuda.empty_cache()
 
-        # if epoch % args.save_per_epoch == 0:
-        #     checkpoint_path = os.path.join("transformer_checkpoints", f"epoch_{epoch}.pt")
-        #     torch.save({
-        #         'epoch': epoch,
-        #         'model_state_dict': train_transformer.model.state_dict(),
-        #         'optimizer_state_dict': train_transformer.optim.state_dict(),
-        #         'scheduler_state_dict': train_transformer.scheduler.state_dict(),
-        #         'train_loss': train_loss,
-        #         'val_loss': val_loss
-        #     }, checkpoint_path)
-        #     print(f"Checkpoint saved at {checkpoint_path}")
-        
         if epoch % args.save_per_epoch == 0:
-            transformer_checkpoint_path = os.path.join("transformer_checkpoints", f"epoch_{epoch}.pt")
+            transformer_checkpoint_path = os.path.join("transformer_checkpoints_3", f"epoch_{epoch}.pt")
             torch.save(train_transformer.model.transformer.state_dict(), transformer_checkpoint_path)
             print(f"Transformer weights saved at {transformer_checkpoint_path}")
+
+    # 在訓練結束時保存損失曲線
+    train_transformer.save_loss_curve()
