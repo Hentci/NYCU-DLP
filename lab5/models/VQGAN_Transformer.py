@@ -54,13 +54,13 @@ class MaskGit(nn.Module):
 
         """
         def linear_gamma(ratio):
-            return ratio
+            return 1 - ratio
         
         def cosine_gamma(ratio):
-            return 0.5 * (1 + np.cos(np.pi * ratio))
+            return np.cos(np.pi * ratio / 2)
         
         def square_gamma(ratio):
-            return ratio ** 2
+            return 1 - ratio ** 2
         
         if mode == "linear":
             return linear_gamma

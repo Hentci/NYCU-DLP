@@ -140,14 +140,14 @@ if __name__ == '__main__':
     
     
 #TODO3 step1-2: modify the path, MVTM parameters
-    parser.add_argument('--load-transformer-ckpt-path', type=str, default='/home/hentci/code/NYCU-DLP/lab5/transformer_checkpoints_2/epoch_30.pt', help='load ckpt')
+    parser.add_argument('--load-transformer-ckpt-path', type=str, default='/home/hentci/code/NYCU-DLP/lab5/transformer_checkpoints_3/epoch_25.pt', help='load ckpt')
     
     #dataset path
     parser.add_argument('--test-maskedimage-path', type=str, default='/home/hentci/code/lab5_dataset/masked_image', help='Path to testing image dataset.')
     parser.add_argument('--test-mask-path', type=str, default='/home/hentci/code/lab5_dataset/mask64', help='Path to testing mask dataset.')
     #MVTM parameter
-    parser.add_argument('--sweet-spot', type=int, default=2, help='sweet spot: the best step in total iteration')
-    parser.add_argument('--total-iter', type=int, default=20, help='total step for mask scheduling')
+    parser.add_argument('--sweet-spot', type=int, default=20, help='sweet spot: the best step in total iteration')
+    parser.add_argument('--total-iter', type=int, default=25, help='total step for mask scheduling')
     parser.add_argument('--mask-func', type=str, default='cosine', help='mask scheduling function')
 
     args = parser.parse_args()
