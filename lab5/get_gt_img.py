@@ -21,10 +21,11 @@ for i in range(num_images):
     
     # 將 NumPy 陣列轉換為圖片
     img = Image.fromarray(img)
+    
     if i == 0:
         continue
     
     # 儲存圖片
-    img.save(os.path.join(output_dir, f'image_{i - 1:04d}.png'))
+    img.save(os.path.join(output_dir, f'image_{i - 1:03d}.png'))
 
 print(f"已經將 {num_images} 張圖片儲存到資料夾 '{output_dir}' 中。")
