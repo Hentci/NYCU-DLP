@@ -6,6 +6,7 @@ from tqdm import tqdm
 from diffusers import DDPMScheduler
 from model import MultiLabelConditionedUnet  # 確保這個是你在 model.py 中定義的模型類
 from dataloader import get_dataloader  # 確保這個是你在 dataloader.py 中定義的數據加載器函數
+from torchvision import models
 
 # 設置設備
 device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
@@ -26,10 +27,11 @@ object_mapping = {"gray cube": 0, "red cube": 1, "blue cube": 2, "green cube": 3
 train_dataloader = get_dataloader(train_json, dataset_path, object_mapping, batch_size=32, shuffle=True)
 
 # 設定訓練迭代次數
-n_epochs = 50
+n_epochs = 10
 
 # 創建模型並將其移動到設備上
 net = MultiLabelConditionedUnet(num_classes=24, class_emb_size=4).to(device)
+
 
 # 定義損失函數
 loss_fn = nn.MSELoss()
@@ -46,9 +48,10 @@ for epoch in range(n_epochs):
     for x, y in tqdm(train_dataloader, desc=f"Epoch {epoch+1}/{n_epochs}"):
         
         # 獲取數據並準備添加噪聲的版本
-        x = x.to(device) * 2 - 1  # 將數據移動到 GPU 並映射到 (-1, 1) 區間
-        y = [label.to(device) for label in y]  # 將每個標籤張量移動到 GPU
-        y = torch.nn.utils.rnn.pad_sequence(y, batch_first=True)  # 將不同長度的標籤序列填充為相同長度
+        x = x.to(device)  # 將數據移動到 GPU 
+        y = y.to(device)
+        # y = [label.to(device) for label in y]  # 將每個標籤張量移動到 GPU
+        # y = torch.nn.utils.rnn.pad_sequence(y, batch_first=True)  # 將不同長度的標籤序列填充為相同長度
         # print(y)
         
         noise = torch.randn_like(x)

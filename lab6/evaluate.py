@@ -60,6 +60,7 @@ for idx, label_list in enumerate(test_data):
 
 # Convert lists to tensors
 images = torch.stack(images)
+# images = images.clip(-1, 1)
 labels = torch.stack(labels)
 
 # Instantiate the evaluator model

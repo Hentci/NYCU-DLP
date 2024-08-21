@@ -36,10 +36,12 @@ class CLEVRDataset(Dataset):
         if self.transform:
             image = self.transform(image)
 
-        # 將物件名稱轉換為索引
-        labels = [self.object_mapping[label] for label in label_names]
+        # 將物件名稱轉換為 one-hot 向量
+        labels = torch.zeros(len(self.object_mapping))  # 創建一個長度為 24 的零向量
+        for label in label_names:
+            labels[self.object_mapping[label]] = 1  # 將對應的索引位置設置為 1
 
-        return image, torch.tensor(labels)
+        return image, labels
 
 def custom_collate_fn(batch):
     images, labels = zip(*batch)
@@ -47,8 +49,8 @@ def custom_collate_fn(batch):
     # 将图片堆叠为一个张量
     images = torch.stack(images, 0)
 
-    # 保持labels为不同大小的列表
-    labels = list(labels)
+    # 将标签堆叠为一个张量
+    labels = torch.stack(labels, 0)
 
     return images, labels
 
@@ -80,5 +82,5 @@ train_loader = get_dataloader(train_json, dataset_path, object_mapping, batch_si
 # 測試 DataLoader
 for images, labels in train_loader:
     print(images.shape)  
-    print(labels)  # Labels 會是大小不同的 tensor 列表
+    print(labels)  # Labels 會是 one-hot 編碼的 tensor
     break
