@@ -43,7 +43,7 @@ class evaluation_model():
             nn.Linear(512,24),
             nn.Sigmoid()
         )
-        self.resnet18.load_state_dict(checkpoint['./checkpoint.pth'])
+        self.resnet18.load_state_dict(checkpoint['model'])
         self.resnet18 = self.resnet18.cuda()
         self.resnet18.eval()
         self.classnum = 24

@@ -36,7 +36,10 @@ class MultiLabelConditionedUnet(nn.Module):
         class_cond = self.class_emb(class_labels) # Map to embedding dimension
 
         # Sum the class embeddings along the label dimension
-        class_cond = class_cond.sum(dim=1)
+        # class_cond = class_cond.sum(dim=1)
+        
+        # Option 2: Average the embeddings along the label dimension
+        class_cond = class_cond.mean(dim=1)
 
         # Reshape and expand the class_cond to match the image dimensions
         class_cond = class_cond.view(bs, class_cond.shape[1], 1, 1).expand(bs, class_cond.shape[1], w, h)

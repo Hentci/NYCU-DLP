@@ -12,7 +12,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # 加載已訓練的模型
 net = MultiLabelConditionedUnet(num_classes=24, class_emb_size=4).to(device)
-net.load_state_dict(torch.load('/home/hentci/code/NYCU-DLP/lab6/64x64_saved_models/model_epoch_10.pth'))
+net.load_state_dict(torch.load('/home/hentci/code/NYCU-DLP/lab6/64x64_saved_models/model_epoch_5.pth'))
 net.eval()
 
 # 創建噪聲調度器
@@ -60,5 +60,7 @@ for labels in tqdm(test_data, desc="Generating samples"):
 
     # 你可以將每張生成的圖片保存在指定的目錄下
     generated_image.save(f'generated_images/sample_{test_data.index(labels)}.png')
+    
+    print('save image: ',test_data.index(labels))
 
 print("Image generation completed.")
