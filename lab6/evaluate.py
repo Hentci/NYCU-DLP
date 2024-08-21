@@ -8,12 +8,26 @@ from PIL import Image
 # Assuming evaluation_model is defined as in the provided code
 from evaluator import evaluation_model
 
+import numpy as np
+import random
+
+
+seed = 42
+
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.random.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
+torch.backends.cudnn.deterministic = True
+
 # Function to denormalize the images for visualization
 def denormalize(tensor):
     return tensor * torch.tensor((0.5, 0.5, 0.5)).view(3, 1, 1) + torch.tensor((0.5, 0.5, 0.5)).view(3, 1, 1)
 
 # Load test.json and define object_mapping
-with open('./test.json', 'r') as f:
+with open('./new_test.json', 'r') as f:
     test_data = json.load(f)
 
 object_mapping = {"gray cube": 0, "red cube": 1, "blue cube": 2, "green cube": 3, 
@@ -45,7 +59,8 @@ transform = transforms.Compose([
 
 # Iterate over the test data and corresponding image files
 for idx, label_list in enumerate(test_data):
-    img_name = f"sample_{idx}.png"  # Assuming images are named like image_000.png, image_001.png, etc.
+    print(idx, ':',label_list)
+    img_name = f"sample_{idx}.png"  
     img_path = os.path.join(image_dir, img_name)
     
     if os.path.exists(img_path):
@@ -58,10 +73,12 @@ for idx, label_list in enumerate(test_data):
     else:
         print(f"Image {img_name} not found in {image_dir}.")
 
-# Convert lists to tensors
-images = torch.stack(images)
-# images = images.clip(-1, 1)
-labels = torch.stack(labels)
+# # Convert lists to tensors
+# images = torch.stack(images)
+# # # images = images.clip(-1, 1)
+# labels = torch.stack(labels)
+
+print(images)
 
 # Instantiate the evaluator model
 evaluator = evaluation_model()

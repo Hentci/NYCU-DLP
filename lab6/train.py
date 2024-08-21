@@ -27,7 +27,7 @@ object_mapping = {"gray cube": 0, "red cube": 1, "blue cube": 2, "green cube": 3
 train_dataloader = get_dataloader(train_json, dataset_path, object_mapping, batch_size=32, shuffle=True)
 
 # 設定訓練迭代次數
-n_epochs = 10
+n_epochs = 100
 
 # 創建模型並將其移動到設備上
 net = MultiLabelConditionedUnet(num_classes=24, class_emb_size=4).to(device)

@@ -8,16 +8,28 @@ from model import MultiLabelConditionedUnet
 import torchvision.transforms as transforms
 from torchvision.utils import make_grid
 from PIL import Image
+import numpy as np
+import random
 
 # Assuming evaluation_model is defined as in the provided code
 from evaluator import evaluation_model
+
+seed = 42
+
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.random.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
+torch.backends.cudnn.deterministic = True
 
 # 設置設備
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # 加載已訓練的模型
 net = MultiLabelConditionedUnet(num_classes=24, class_emb_size=4).to(device)
-net.load_state_dict(torch.load('/home/hentci/code/NYCU-DLP/lab6/64x64_saved_models/model_epoch_2.pth'))
+net.load_state_dict(torch.load('/home/hentci/code/NYCU-DLP/lab6/64x64_saved_models/model_epoch_9.pth'))
 net.eval()
 
 # 創建噪聲調度器
