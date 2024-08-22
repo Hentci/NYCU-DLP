@@ -73,10 +73,10 @@ for idx, label_list in enumerate(test_data):
     else:
         print(f"Image {img_name} not found in {image_dir}.")
 
-# # Convert lists to tensors
-# images = torch.stack(images)
-# # # images = images.clip(-1, 1)
-# labels = torch.stack(labels)
+# Convert lists to tensors
+images = torch.stack(images)
+# # images = images.clip(-1, 1)
+labels = torch.stack(labels)
 
 print(images)
 

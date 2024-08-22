@@ -3,7 +3,7 @@
 *saved_models*
 *inference_imgs*
 *.pth*
-*_test*
+*lab4_test*
 *log*
 Lab4_demo/
 *checkpoints*
@@ -11,3 +11,5 @@ Lab4_demo/
 *mask_scheduling/
 *test_results/
 *ground_truth/
+*generated_images/
+*denoise_process/

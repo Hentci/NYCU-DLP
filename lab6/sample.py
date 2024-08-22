@@ -29,14 +29,14 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # 加載已訓練的模型
 net = MultiLabelConditionedUnet(num_classes=24, class_emb_size=4).to(device)
-net.load_state_dict(torch.load('/home/hentci/code/NYCU-DLP/lab6/64x64_saved_models/model_epoch_9.pth'))
+net.load_state_dict(torch.load('/home/hentci/code/NYCU-DLP/lab6/64x64_saved_models/model_epoch_250.pth'))
 net.eval()
 
 # 創建噪聲調度器
 noise_scheduler = DDPMScheduler(num_train_timesteps=1000, beta_schedule='squaredcos_cap_v2')
 
 # 讀取 test.json
-with open('./test.json', 'r') as f:
+with open('./new_test.json', 'r') as f:
     test_data = json.load(f)
 
 # 定義 object_mapping
