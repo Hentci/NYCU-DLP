@@ -45,7 +45,7 @@ def labels_to_one_hot(labels, object_mapping):
     return one_hot
 
 # Directory containing the generated images
-image_dir = '/home/hentci/code/NYCU-DLP/lab6/generated_images'
+image_dir = '/home/hentci/code/NYCU-DLP/lab6/new_test_generated_images'
 
 # Load and preprocess images
 images = []
