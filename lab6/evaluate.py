@@ -26,8 +26,10 @@ torch.backends.cudnn.deterministic = True
 def denormalize(tensor):
     return tensor * torch.tensor((0.5, 0.5, 0.5)).view(3, 1, 1) + torch.tensor((0.5, 0.5, 0.5)).view(3, 1, 1)
 
+test_label_file = './test.json'
+
 # Load test.json and define object_mapping
-with open('./new_test.json', 'r') as f:
+with open(test_label_file, 'r') as f:
     test_data = json.load(f)
 
 object_mapping = {"gray cube": 0, "red cube": 1, "blue cube": 2, "green cube": 3, 
@@ -45,7 +47,7 @@ def labels_to_one_hot(labels, object_mapping):
     return one_hot
 
 # Directory containing the generated images
-image_dir = '/home/hentci/code/NYCU-DLP/lab6/new_test_generated_images'
+image_dir = '/home/hentci/code/NYCU-DLP/lab6/generated_images'
 
 # Load and preprocess images
 images = []
@@ -85,6 +87,7 @@ evaluator = evaluation_model()
 
 # Evaluate the accuracy
 accuracy = evaluator.eval(images.cuda(), labels.cuda())
+print("The test label .json is: ", test_label_file)
 print(f"Accuracy of the synthetic images: {accuracy * 100:.2f}%")
 
 # Denormalize and save images as a grid
